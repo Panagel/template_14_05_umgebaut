@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 3,
+   "laeufe": 4,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -10,6 +10,13 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385",
      "waehrung": "USD",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 174900,
+       "vorher": 199900,
+       "rabatt": 13,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 174900,
@@ -64,6 +71,13 @@
        "vorher": 254900,
        "rabatt": 16,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 214900,
+       "vorher": 254900,
+       "rabatt": 16,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 214900,
@@ -78,6 +92,13 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709395",
      "waehrung": "USD",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 269900,
+       "vorher": 319900,
+       "rabatt": 16,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 269900,
@@ -132,6 +153,13 @@
        "vorher": 174900,
        "rabatt": 11,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 154900,
+       "vorher": 174900,
+       "rabatt": 11,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 154900,
@@ -146,6 +174,13 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=622679274382356483",
      "waehrung": "USD",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 194900,
+       "vorher": 224900,
+       "rabatt": 13,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 194900,
@@ -200,6 +235,13 @@
        "vorher": 209900,
        "rabatt": 12,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 184900,
+       "vorher": 209900,
+       "rabatt": 12,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 184900,
@@ -208,12 +250,32 @@
      "letzterRabatt": 12,
      "verfuegbar": "ja",
      "zuletztGesehen": "2026-09-26"
+    },
+    "776282589202808834|USD": {
+     "name": "[Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo",
+     "url": "https://us.store.bambulab.com/products/refurbished-bambu-lab-h2d-3d-printer?id=776282589202808834",
+     "waehrung": "USD",
+     "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 146900,
+       "vorher": 174900,
+       "rabatt": 16,
+       "verfuegbar": "ja"
+      }
+     ],
+     "bestpreis": 146900,
+     "bestpreisDatum": "2026-09-26",
+     "gemeldeterPreis": null,
+     "letzterRabatt": 16,
+     "verfuegbar": "ja",
+     "zuletztGesehen": "2026-09-26"
     }
    },
    "kampagnen": {}
   },
   "reichelt": {
-   "laeufe": 3,
+   "laeufe": 4,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -221,6 +283,13 @@
      "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245",
      "waehrung": "EUR",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 154900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 154900,
@@ -275,6 +344,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 294900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 294900,
@@ -289,6 +365,13 @@
      "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246",
      "waehrung": "EUR",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 174900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 174900,
@@ -343,6 +426,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 214900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 214900,
@@ -377,6 +467,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 254900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 254900,
@@ -390,5 +487,115 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-09-26T11:09:17.629Z"
+ "letzterLauf": "2026-09-26T11:24:43.843Z",
+ "tiefstpreise": {
+  "combo|USD": {
+   "klasse": "combo",
+   "preis": 174900,
+   "waehrung": "USD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D AMS Combo / Standard",
+   "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385",
+   "datum": "2026-09-26"
+  },
+  "laser10|USD": {
+   "klasse": "laser10",
+   "preis": 214900,
+   "waehrung": "USD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D Laser Full Combo / 10W",
+   "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709390",
+   "datum": "2026-09-26"
+  },
+  "laser40|USD": {
+   "klasse": "laser40",
+   "preis": 269900,
+   "waehrung": "USD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D Laser Full Combo / 40W",
+   "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709395",
+   "datum": "2026-09-26"
+  },
+  "basis|USD": {
+   "klasse": "basis",
+   "preis": 154900,
+   "waehrung": "USD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D / standard",
+   "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709400",
+   "datum": "2026-09-26"
+  },
+  "combo-dual|USD": {
+   "klasse": "combo-dual",
+   "preis": 194900,
+   "waehrung": "USD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D AMS Combo / Dual AMS 2 Pro Bundle",
+   "url": "https://us.store.bambulab.com/products/h2d?id=622679274382356483",
+   "datum": "2026-09-26"
+  },
+  "combo-ht|USD": {
+   "klasse": "combo-ht",
+   "preis": 184900,
+   "waehrung": "USD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D AMS Combo / AMS HT bundle",
+   "url": "https://us.store.bambulab.com/products/h2d?id=622679274382356488",
+   "datum": "2026-09-26"
+  },
+  "gebraucht+combo|USD": {
+   "klasse": "gebraucht+combo",
+   "preis": 146900,
+   "waehrung": "USD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "[Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo",
+   "url": "https://us.store.bambulab.com/products/refurbished-bambu-lab-h2d-3d-printer?id=776282589202808834",
+   "datum": "2026-09-26"
+  },
+  "basis|EUR": {
+   "klasse": "basis",
+   "preis": 154900,
+   "waehrung": "EUR",
+   "shop": "reichelt",
+   "name": "3D Drucker, Bambu Lab H2D",
+   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245",
+   "datum": "2026-09-26"
+  },
+  "pro+basis|EUR": {
+   "klasse": "pro+basis",
+   "preis": 294900,
+   "waehrung": "EUR",
+   "shop": "reichelt",
+   "name": "3D Drucker, Bambu Lab H2D Pro",
+   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_pro-411918",
+   "datum": "2026-09-26"
+  },
+  "combo|EUR": {
+   "klasse": "combo",
+   "preis": 174900,
+   "waehrung": "EUR",
+   "shop": "reichelt",
+   "name": "3D Drucker, Bambu Lab H2D AMS Combo",
+   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246",
+   "datum": "2026-09-26"
+  },
+  "laser10|EUR": {
+   "klasse": "laser10",
+   "preis": 214900,
+   "waehrung": "EUR",
+   "shop": "reichelt",
+   "name": "3D Drucker, Bambu Lab H2D, 10 W Laser",
+   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_10_w_laser-401759",
+   "datum": "2026-09-26"
+  },
+  "laser40|EUR": {
+   "klasse": "laser40",
+   "preis": 254900,
+   "waehrung": "EUR",
+   "shop": "reichelt",
+   "name": "3D Drucker, Bambu Lab H2D, 40 W Laser",
+   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_40_w_laser-401760",
+   "datum": "2026-09-26"
+  }
+ }
 }
