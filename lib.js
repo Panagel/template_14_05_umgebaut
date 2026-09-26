@@ -228,6 +228,62 @@ function produkteAusJsonLd(html, basis) {
   return out;
 }
 
+// --------------------------------------------------------------- Microdata
+// Nicht jeder Shop legt JSON-LD in die Seite. Shopware-Themes und mancher
+// Haendler schreiben dieselben schema.org-Felder als itemprop-Attribute ins
+// Markup. Inhaltlich ist es dasselbe, nur muehsamer zu lesen.
+function ipAttr(blk, feld) {
+  const re1 = new RegExp('itemprop="' + feld + '"[^>]*?\\b(?:content|href)="([^"]*)"', 'i');
+  const re2 = new RegExp('(?:content|href)="([^"]*)"[^>]*?itemprop="' + feld + '"', 'i');
+  const re3 = new RegExp('itemprop="' + feld + '"[^>]*>\\s*([^<]{2,160})', 'i');
+  const m = blk.match(re1) || blk.match(re2) || blk.match(re3);
+  return m ? unent(m[1]).trim() : null;
+}
+
+function produkteAusMicrodata(html, basis) {
+  const out = [];
+  const teile = String(html).split(/itemtype="https?:\/\/schema\.org\/Product"/i);
+  for (let i = 1; i < teile.length; i++) {
+    // Nur das eigene Fragment ansehen: der naechste Product-Block beginnt
+    // mit dem naechsten Teilstueck, mehr Kontext braucht es nicht.
+    const blk = teile[i].slice(0, 8000);
+    const jetzt = cents(ipAttr(blk, 'price'));
+    if (jetzt === null) continue;
+    const name = ipAttr(blk, 'name');
+    if (!name) continue;
+    let url = ipAttr(blk, 'url');
+    if (url && !/^https?:/i.test(url)) url = basis + (url.startsWith('/') ? '' : '/') + url;
+    const verf = ipAttr(blk, 'availability') || '';
+    out.push({
+      id: String(ipAttr(blk, 'sku') || ipAttr(blk, 'mpn') || url || name).slice(0, 80),
+      name: name,
+      jetzt: jetzt,
+      // Streichpreise stehen in Microdata praktisch nie - dort greift dann
+      // nur der Vergleich gegen die eigene Vorgeschichte.
+      vorher: null,
+      waehrung: (ipAttr(blk, 'priceCurrency') || '').toUpperCase() || null,
+      verfuegbar: VERFUEGBAR_RE.test(verf) ? 'ja' : (VORBESTELLUNG_RE.test(verf) ? 'vorbestellung' : (verf ? 'nein' : null)),
+      url: url
+    });
+  }
+  return out;
+}
+
+// Beide Wege zusammen, doppelte Treffer heraus. Ein Shop kann dieselbe Ware
+// als JSON-LD und als Microdata auszeichnen; JSON-LD gewinnt, weil dort auch
+// der Streichpreis steht.
+function produkteAusSeite(html, basis) {
+  const out = produkteAusJsonLd(html, basis);
+  const bekannt = new Set(out.map(p => (p.url || '') + '|' + p.jetzt));
+  const bekanntName = new Set(out.map(p => p.name.toLowerCase() + '|' + p.jetzt));
+  for (const p of produkteAusMicrodata(html, basis)) {
+    if (bekannt.has((p.url || '') + '|' + p.jetzt)) continue;
+    if (bekanntName.has(p.name.toLowerCase() + '|' + p.jetzt)) continue;
+    out.push(p);
+  }
+  return out;
+}
+
 // Links einer Seite, deren Adresse auf das gesuchte Modell passt. Dient als
 // Rueckfallweg, wenn eine Trefferliste ihre Preise erst per JavaScript holt.
 function linksMitModell(html, basis, modellRe) {
@@ -250,5 +306,6 @@ function linksMitModell(html, basis, modellRe) {
 
 module.exports = {
   get, getJson, textOf, unent, cents, eur, median, pct, sleep, UA,
-  jsonLdBloecke, flachJsonLd, istTyp, ausOffers, produkteAusJsonLd, linksMitModell
+  jsonLdBloecke, flachJsonLd, istTyp, ausOffers, produkteAusJsonLd,
+  produkteAusMicrodata, produkteAusSeite, linksMitModell
 };
