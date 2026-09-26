@@ -58,6 +58,31 @@ module.exports = {
     ['basis',      /./,                             'H2D']
   ],
 
+  // Welche Ausbaustufen ueberhaupt beobachtet werden. Was hier auf false
+  // steht, wird gar nicht erst in den Zustand aufgenommen: keine Meldung,
+  // keine Zeile im Log, kein Tiefstpreis.
+  //
+  // Gewuenscht ist das Geraet selbst und das Geraet mit AMS 2 Pro. Die
+  // Laserfassungen und die groesseren Bundles stehen aus - ein Wort auf
+  // true genuegt, um eine davon wieder mitlaufen zu lassen.
+  klassenAktiv: {
+    basis: true,               // H2D allein
+    combo: true,               // H2D mit AMS 2 Pro
+    'combo-dual': false,       // H2D mit zwei AMS 2 Pro
+    'combo-ht': false,         // H2D mit AMS HT
+    laser10: false,            // H2D Laser Full Combo 10 W
+    laser40: false,            // H2D Laser Full Combo 40 W
+    laser: false               // Laserfassung ohne Wattangabe
+  },
+
+  // Das Pro-Modell ist ein anderes Geraet, nicht das gesuchte.
+  proMelden: false,
+
+  // Aufgearbeitete Geraete bleiben drin: dasselbe Geraet, nur guenstiger -
+  // beim Hersteller derzeit der billigste Weg an ein H2D mit AMS. Jede
+  // Meldung dazu ist als "(aufgearbeitet)" gekennzeichnet.
+  gebrauchtMelden: true,
+
   // "Pro" zaehlt getrennt, sonst wuerde ein Pro-Geraet den Tiefstpreis des
   // einfachen Modells setzen. Wortnah gepruefte Stelle: "AMS 2 Pro" im
   // Bundle-Namen ist nicht das Pro-Modell.

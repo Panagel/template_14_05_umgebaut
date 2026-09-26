@@ -27,7 +27,11 @@ function istModell(p) {
   const name = String(p.name || '');
   if (!CFG.modellRe.test(name)) return false;
   if (CFG.ausschlussRe.test(name)) return false;
-  return p.jetzt >= CFG.preisMin && p.jetzt <= CFG.preisMax;
+  if (p.jetzt < CFG.preisMin || p.jetzt > CFG.preisMax) return false;
+  // Ausbaustufen, die nicht beobachtet werden, kommen gar nicht erst in den
+  // Zustand - sonst schleppt der Watcher Vorgeschichte mit, die niemand
+  // sehen will.
+  return klasseGewuenscht(variantenKlasse(name));
 }
 
 // Welche Ausbaustufe ist das? Zwei Shops nennen dasselbe Geraet anders,
@@ -52,6 +56,16 @@ function klassenName(klasse) {
   return name;
 }
 
+// Interessiert diese Ausbaustufe? Der Kern der Klasse entscheidet, die
+// Vorsilben "pro" und "gebraucht" haben eigene Schalter.
+function klasseGewuenscht(klasse) {
+  const teile = String(klasse).split('+');
+  const kern = teile[teile.length - 1];
+  if (teile.includes('pro') && !CFG.proMelden) return false;
+  if (teile.includes('gebraucht') && !CFG.gebrauchtMelden) return false;
+  return CFG.klassenAktiv[kern] === true;
+}
+
 // Warum ein Treffer durchgefallen ist - nur fuer die Diagnose.
 function warumNicht(p) {
   const name = String(p.name || '');
@@ -60,6 +74,8 @@ function warumNicht(p) {
   if (CFG.ausschlussRe.test(name)) return 'Zubehoer (' + (name.match(CFG.ausschlussRe) || [''])[0] + ')';
   if (p.jetzt < CFG.preisMin) return 'zu billig fuer ein Geraet';
   if (p.jetzt > CFG.preisMax) return 'zu teuer, wohl ein Bundle-Sammelposten';
+  const k = variantenKlasse(name);
+  if (!klasseGewuenscht(k)) return 'Ausbaustufe steht aus (' + klassenName(k) + ')';
   return 'unklar';
 }
 
@@ -328,4 +344,4 @@ const SHOPS = {
   }
 };
 
-module.exports = { SHOPS, istModell, warumNicht, variantenKlasse, klassenName, sammleBanner, AKTION_RE, bambu, haendler };
+module.exports = { SHOPS, istModell, warumNicht, variantenKlasse, klassenName, klasseGewuenscht, sammleBanner, AKTION_RE, bambu, haendler };

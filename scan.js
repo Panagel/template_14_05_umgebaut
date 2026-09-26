@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { median, geld } = require('./lib.js');
-const { SHOPS, variantenKlasse, klassenName } = require('./shops.js');
+const { SHOPS, variantenKlasse, klassenName, klasseGewuenscht } = require('./shops.js');
 const CFG = require('./config.js');
 
 const DATA = path.join(__dirname, 'data');
@@ -146,6 +146,14 @@ async function main() {
       // Waehrung und derselben Ausbaustufe: der Preis eines Laser-Combo
       // sagt nichts ueber das nackte Geraet.
       const klasse = variantenKlasse(p.name);
+      // Sicherheitsnetz: die Adapter sieben nicht beobachtete Ausbaustufen
+      // schon aus, aber die Regel gehoert auch dorthin, wo die Meldungen
+      // entstehen. Ein Adapter, der es kuenftig vergisst, kommt hier nicht
+      // durch.
+      if (!klasseGewuenscht(klasse)) {
+        log('   - ' + p.name + '  ' + g(p.jetzt) + '  (Ausbaustufe steht aus)');
+        continue;
+      }
       const tKey = klasse + '|' + (p.waehrung || '?');
       const tief = state.tiefstpreise[tKey];
       let tiefstand = null;
@@ -311,11 +319,17 @@ async function main() {
   fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
   // Tiefstpreise mitschreiben: so zeigt die Testmeldung, was der Watcher
   // als Bestmarke fuehrt, ohne dass man state.json lesen muss.
-  const tiefstListe = Object.keys(state.tiefstpreise).sort().map(k => {
-    const t = state.tiefstpreise[k];
-    return { klasse: klassenName(t.klasse || k.split('|')[0]), preis: geld(t.preis, t.waehrung),
-             shop: t.shop, datum: t.datum, url: t.url };
-  });
+  // Bestmarken von Ausbaustufen, die nicht mehr beobachtet werden, bleiben
+  // im Zustand stehen - loeschen wuerde die Vorgeschichte wegwerfen, falls
+  // eine Stufe wieder eingeschaltet wird -, aber sie tauchen nicht mehr in
+  // Log und Meldungen auf.
+  const tiefstListe = Object.keys(state.tiefstpreise).sort()
+    .filter(k => klasseGewuenscht(state.tiefstpreise[k].klasse || k.split('|')[0]))
+    .map(k => {
+      const t = state.tiefstpreise[k];
+      return { klasse: klassenName(t.klasse || k.split('|')[0]), preis: geld(t.preis, t.waehrung),
+               shop: t.shop, datum: t.datum, url: t.url };
+    });
   fs.writeFileSync(MELD, JSON.stringify({
     datum: heute, meldungen: meldungen, uebersicht: uebersicht, tiefstpreise: tiefstListe
   }, null, 1));
