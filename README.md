@@ -118,15 +118,17 @@ So sieht ein guter Lauf aus — echte Ausgabe vom 26.09.2026:
 
 ```
 == Bambu Lab Store (US-Ansicht)
-    Sitemap: 2 Modellseite(n) von 1104
+    Sitemap: 3 Modellseite(n) von 1104
     h2d: 6 Variante(n)
     h2d-pro: 0 Variante(n)
+    refurbished-h2d-3d-printer: 1 Variante(n)
    . Bambu Lab H2D - H2D AMS Combo / Standard  1.749,00 USD  (-13%)  [Tief 1.749,00 USD]
-   . Bambu Lab H2D - H2D Laser Full Combo / 10W  2.149,00 USD  (-16%)  [Tief 2.149,00 USD]
-   . Bambu Lab H2D - H2D Laser Full Combo / 40W  2.699,00 USD  (-16%)  [Tief 2.699,00 USD]
+   . Bambu Lab H2D - H2D Laser Full Combo / 10W  2.149,00 USD  (-16%)
+   . Bambu Lab H2D - H2D Laser Full Combo / 40W  2.699,00 USD  (-16%)
    . Bambu Lab H2D - H2D / standard  1.549,00 USD  (-11%)  [Tief 1.549,00 USD]
    . Bambu Lab H2D - H2D AMS Combo / Dual AMS 2 Pro Bundle  1.949,00 USD  (-13%)
    . Bambu Lab H2D - H2D AMS Combo / AMS HT bundle  1.849,00 USD  (-12%)
+   + [Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo  1.469,00 USD  (-16%)  NEU
 == reichelt
     Trefferliste: 5 Geraete
     5 Geraete, 11 verworfen
@@ -136,8 +138,25 @@ So sieht ein guter Lauf aus — echte Ausgabe vom 26.09.2026:
    . 3D Drucker, Bambu Lab H2D, 10 W Laser  2.149,00 EUR  [Tief 2.149,00 EUR]
    . 3D Drucker, Bambu Lab H2D, 40 W Laser  2.549,00 EUR  [Tief 2.549,00 EUR]
 
-Meldungen: 0 | Shops mit Daten: 2
+Tiefstpreise bisher:
+   H2D                                 1.549,00 EUR  reichelt  (2026-09-26)
+   H2D                                 1.549,00 USD  Bambu Lab Store (US-Ansicht)
+   H2D AMS Combo                       1.749,00 EUR  reichelt  (2026-09-26)
+   H2D AMS Combo                       1.749,00 USD  Bambu Lab Store (US-Ansicht)
+   H2D AMS Combo (Dual AMS 2 Pro)      1.949,00 USD  Bambu Lab Store (US-Ansicht)
+   H2D AMS Combo (AMS HT)              1.849,00 USD  Bambu Lab Store (US-Ansicht)
+   H2D AMS Combo (aufgearbeitet)       1.469,00 USD  Bambu Lab Store (US-Ansicht)
+   H2D Laser 10 W                      2.149,00 EUR  reichelt  (2026-09-26)
+   H2D Laser 40 W                      2.549,00 EUR  reichelt  (2026-09-26)
+   H2D Pro                             2.949,00 EUR  reichelt  (2026-09-26)
+
+Meldungen: 1 | Shops mit Daten: 2
 ```
+
+Zwoelf Varianten in zwoelf Vergleichsgruppen, und man sieht sofort, was der
+Markt macht: reichelt ist beim 40-Watt-Laser 150 EUR unter dem US-Preis, und
+die guenstigste Fassung des Geraets mit AMS ist ein aufgearbeitetes zu
+1.469 USD.
 
 Die Zeichen am Zeilenanfang sind die Kurzfassung:
 
@@ -164,7 +183,7 @@ Workflow **Shop-Diagnose** (`diag.js`).
 
 | Shop | Zugriff | Ergebnis | Status |
 |---|---|---|---|
-| Bambu Lab Store | JSON-LD (`ProductGroup`) je Produktseite, Adressen aus der Produkt-Sitemap | 6 Varianten mit Preis, Streichpreis und Lagerstand | laeuft, **US-Preise** |
+| Bambu Lab Store | JSON-LD (`ProductGroup`) je Produktseite, Adressen aus der Produkt-Sitemap | 7 Varianten mit Preis, Streichpreis und Lagerstand, aufgearbeitete Geraete inbegriffen | laeuft, **US-Preise** |
 | reichelt | `itemprop`-Microdata in der Trefferliste | 5 Varianten in EUR, mit Lagerstand | laeuft |
 
 Der Herstellershop ist eine Next.js-Anwendung: im Markup steht fast nichts
@@ -173,11 +192,13 @@ einen vollstaendigen schema.org-Block. Das ist stabiler als jedes Markup —
 Klassennamen aendern sich beim Theme-Wechsel, schema.org bleibt, weil es fuer
 Google gepflegt wird.
 
-Welche Produktseiten es gibt, sagt die Sitemap: 1104 Adressen, davon zwei,
-deren Kurzname mit dem Modell **beginnt** (`h2d`, `h2d-pro`). Das ist die
-Trennlinie zum Zubehoer — `dual-extruder-unit-h2d-h2c` traegt den
-Modellnamen hinten und ist ein Ersatzteil. Ein spaeteres H2D-Modell taucht so
-von allein auf.
+Welche Produktseiten es gibt, sagt die Sitemap: 1104 Adressen, davon drei
+Modellseiten. Zwei, deren Kurzname mit dem Modell **beginnt** (`h2d`,
+`h2d-pro`) — das ist die Trennlinie zum Zubehoer, denn
+`dual-extruder-unit-h2d-h2c` traegt den Modellnamen hinten und ist ein
+Ersatzteil. Und eine ueber die zweite, lockere Regel:
+`refurbished-h2d-3d-printer`. Ein spaeteres H2D-Modell taucht so von allein
+auf; geprueft an 18 echten Kurznamen aus der Sitemap.
 
 `h2d-pro` liefert derzeit keine Variante: die Seite antwortet, traegt aber
 keinen Preisblock. Den Pro-Preis kennt der Watcher trotzdem — ueber reichelt.
