@@ -116,8 +116,13 @@ function cents(s) {
   return g * 100 + (Number.isNaN(dez) ? 0 : dez);
 }
 
-const eur = c => (c === null || c === undefined) ? '-' :
-  (c / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EUR';
+const betrag = c => (c / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const eur = c => (c === null || c === undefined) ? '-' : betrag(c) + ' EUR';
+
+// Waehrung mitfuehren statt annehmen: derselbe Shop antwortet je nach
+// Standort des Abfragenden in USD oder EUR. Ein Betrag ohne Waehrung ist
+// im Zweifel eine falsche Meldung.
+const geld = (c, w) => (c === null || c === undefined) ? '-' : betrag(c) + ' ' + (w || '?');
 
 function median(arr) {
   const a = arr.filter(v => typeof v === 'number' && !Number.isNaN(v)).sort((x, y) => x - y);
@@ -305,7 +310,7 @@ function linksMitModell(html, basis, modellRe) {
 }
 
 module.exports = {
-  get, getJson, textOf, unent, cents, eur, median, pct, sleep, UA,
+  get, getJson, textOf, unent, cents, eur, geld, median, pct, sleep, UA,
   jsonLdBloecke, flachJsonLd, istTyp, ausOffers, produkteAusJsonLd,
   produkteAusMicrodata, produkteAusSeite, linksMitModell
 };

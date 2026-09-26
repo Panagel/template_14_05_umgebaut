@@ -1,15 +1,18 @@
 // Shop-Adapter. Jeder liefert { produkte, banner, hinweise } fuer einen Lauf.
 //
-// Zwei Zugriffsarten reichen fuer den ganzen Markt:
+// Zwei Zugriffsarten decken den Markt ab, beide gemessen am 26.09.2026 von
+// einem GitHub-Runner aus (siehe README und diag.js):
 //
-//   shopify - der Bambu-Lab-Shop selbst. Seine JSON-Endpunkte nennen Preis,
-//             Streichpreis und Lagerstand jeder Variante exakt in Cent. Kein
-//             Parsen von Markup, also auch nichts, was ein Theme-Update
-//             kaputtmacht.
-//   jsonld  - jeder Haendler. Wer bei Google Shopping auftauchen will, legt
-//             seine Preise als schema.org-Product in die Seite. Das ist die
-//             einzige Schnittstelle, die alle Shops gemeinsam haben.
-const { get, getJson, textOf, unent, cents, sleep, produkteAusJsonLd, linksMitModell } = require('./lib.js');
+//   bambu    - der Herstellershop. Eine Next.js-Anwendung, im Markup steht
+//              fast nichts Sichtbares, aber jede Produktseite traegt einen
+//              vollstaendigen JSON-LD-Block vom Typ ProductGroup: eine
+//              Variante je Ausbaustufe, mit Preis, Streichpreis und
+//              Lagerstand. Welche Seiten es gibt, sagt die Produkt-Sitemap.
+//   haendler - schema.org, gleichgueltig ob als JSON-LD oder als
+//              itemprop-Microdata im Markup. Das ist die einzige
+//              Schnittstelle, die alle Haendler gemeinsam haben, und sie
+//              ueberlebt Theme-Wechsel, weil sie fuer Google gepflegt wird.
+const { get, textOf, unent, cents, sleep, geld, produkteAusSeite, linksMitModell } = require('./lib.js');
 const CFG = require('./config.js');
 
 // Ein Treffer ist das gesuchte Geraet, wenn der Name das Modell nennt, kein
@@ -38,88 +41,51 @@ function warumNicht(p) {
   return 'unklar';
 }
 
-// ---------------------------------------------------------------- Shopify
-// /products/<handle>.js gibt genau das, was der Watcher braucht:
-// price und compare_at_price in Cent, available je Variante.
-function ausShopifyProdukt(pr, basis) {
-  const out = [];
-  const varianten = Array.isArray(pr.variants) && pr.variants.length ? pr.variants : [{
-    id: pr.id, title: '', price: pr.price, compare_at_price: pr.compare_at_price,
-    available: pr.available, sku: null
-  }];
-  for (const v of varianten) {
-    const jetzt = cents(typeof v.price === 'number' ? v.price / 100 : v.price);
-    let vorher = cents(typeof v.compare_at_price === 'number' ? v.compare_at_price / 100 : v.compare_at_price);
-    // Shopify traegt den Streichpreis oft gleich dem Preis ein, wenn keine
-    // Aktion laeuft. Das ist kein Rabatt von 0 %, das ist kein Rabatt.
-    if (vorher !== null && jetzt !== null && vorher <= jetzt) vorher = null;
-    const zusatz = v.title && !/^default title$/i.test(v.title) ? ' - ' + v.title : '';
-    out.push({
-      id: 'v' + (v.id || v.sku || pr.handle),
-      name: unent(String(pr.title || '')).trim() + zusatz,
-      jetzt: jetzt,
-      vorher: vorher,
-      waehrung: null,                       // Shopify nennt sie hier nicht
-      verfuegbar: v.available === false ? 'nein' : (v.available === true ? 'ja' : null),
-      url: basis + '/products/' + pr.handle + (v.id ? '?variant=' + v.id : '')
-    });
-  }
-  return out;
-}
-
-async function shopify(cfg, log) {
-  const gefunden = new Map();          // handle -> Produktobjekt
+// ------------------------------------------------------------- Bambu Lab
+// Gefiltert wird auf Adressen, deren Kurzname mit dem Modell beginnt: "h2d"
+// und "h2d-pro" gehoeren dazu, "dual-extruder-unit-h2d-h2c" ist Zubehoer und
+// faellt schon vor dem Abruf heraus.
+async function bambu(cfg, log) {
   const hinweise = [];
+  const seiten = new Set((cfg.seiten || []).map(s => cfg.basis + s));
 
-  // 1. Suchvorschlaege: klein, schnell und nennt die echten Handles. Damit
-  //    muss keine Adresse geraten werden - neue Varianten wie ein spaeteres
-  //    Pro-Modell tauchen von allein auf.
-  const sug = await getJson(cfg.basis + '/search/suggest.json?q=' + encodeURIComponent(cfg.suche) +
-    '&resources[type]=product&resources[limit]=10&resources[options][unavailable_products]=show');
-  const treffer = sug.daten && sug.daten.resources && sug.daten.resources.results
-    ? (sug.daten.resources.results.products || []) : [];
-  if (treffer.length) {
-    log('    Suche: ' + treffer.length + ' Vorschlaege');
-    for (const t of treffer) if (t.handle) gefunden.set(t.handle, null);
+  const sm = await get(cfg.basis + cfg.sitemap);
+  if (sm.status === 200 && sm.body) {
+    const re = /<loc>\s*([^<\s]+)\s*<\/loc>/gi;
+    let m, gefunden = 0;
+    while ((m = re.exec(sm.body))) {
+      const slug = (m[1].match(/\/products\/([^/?#]+)\/?$/) || [])[1];
+      if (!slug || !CFG.modellSlugRe.test(slug)) continue;
+      if (CFG.ausschlussRe.test(slug.replace(/[-_]/g, ' '))) continue;
+      seiten.add(m[1]);
+      gefunden++;
+    }
+    log('    Sitemap: ' + gefunden + ' Modellseite(n) von ' + (sm.body.match(/<loc>/g) || []).length);
   } else {
-    hinweise.push('suggest.json: HTTP ' + sug.status + (sug.daten ? ' (keine Treffer)' : ''));
-    log('    Suche: HTTP ' + sug.status + ' - ohne Treffer');
+    // Ohne Sitemap laeuft der Watcher auf den festen Adressen weiter.
+    hinweise.push('Sitemap: HTTP ' + sm.status);
+    log('    Sitemap: HTTP ' + sm.status + ' - nur feste Adressen');
   }
 
-  // 2. Bekannte Handles aus der Konfiguration dazu. Faellt die Suche aus,
-  //    laeuft der Watcher darueber weiter.
-  for (const h of (cfg.handles || [])) if (!gefunden.has(h)) gefunden.set(h, null);
-
-  // 3. Jedes Handle einzeln abfragen - das ist die einzige Quelle mit
-  //    verlaesslichen Cent-Betraegen.
   const produkte = [], verworfen = [];
-  for (const handle of gefunden.keys()) {
-    const r = await getJson(cfg.basis + '/products/' + handle + '.js');
-    if (!r.daten) {
-      if (r.status !== 404) hinweise.push('products/' + handle + '.js: HTTP ' + r.status);
+  const gesehen = new Set();
+  for (const url of seiten) {
+    const r = await get(url);
+    if (r.status !== 200 || !r.body) {
+      hinweise.push(url.replace(cfg.basis, '') + ': HTTP ' + r.status);
+      log('    ' + url.split('/').pop() + ': HTTP ' + r.status);
       continue;
     }
-    for (const p of ausShopifyProdukt(r.daten, cfg.basis)) {
-      if (istModell(p)) produkte.push(p); else verworfen.push(p);
+    let neu = 0;
+    for (const p of produkteAusSeite(r.body, cfg.basis)) {
+      const key = p.id || p.url;
+      if (gesehen.has(key)) continue;
+      gesehen.add(key);
+      if (istModell(p)) { produkte.push(p); neu++; } else verworfen.push(p);
     }
-    await sleep(500);
+    log('    ' + url.split('/').pop() + ': ' + neu + ' Variante(n)');
+    await sleep(700);
   }
-
-  // 4. Rueckfallweg: die Sammlung mit den Druckern am Stueck. Nur noetig,
-  //    wenn Suche und Handles beide nichts hergaben.
-  if (!produkte.length && cfg.sammlung) {
-    const r = await getJson(cfg.basis + '/collections/' + cfg.sammlung + '/products.json?limit=250');
-    const liste = r.daten && r.daten.products ? r.daten.products : [];
-    log('    Sammlung ' + cfg.sammlung + ': ' + liste.length + ' Produkte (HTTP ' + r.status + ')');
-    for (const pr of liste) {
-      for (const p of ausShopifyProdukt(pr, cfg.basis)) {
-        if (istModell(p)) produkte.push(p); else verworfen.push(p);
-      }
-    }
-    if (!liste.length) hinweise.push('collections/' + cfg.sammlung + '/products.json: HTTP ' + r.status);
-  }
-
-  log('    ' + produkte.length + ' Geraete, ' + verworfen.length + ' verworfen (Zubehoer/Preisspanne)');
 
   // Banner von der Startseite: dort steht die beworbene Aktion samt Code.
   const home = await get(cfg.basis + '/');
@@ -127,11 +93,11 @@ async function shopify(cfg, log) {
   return { produkte: produkte, banner: sammleBanner(home.body || ''), hinweise: hinweise, verworfen: verworfen };
 }
 
-// ----------------------------------------------------------------- JSON-LD
+// ---------------------------------------------------------------- Haendler
 // Erst die Trefferliste, dann - falls die ihre Preise erst per JavaScript
 // nachlaedt - die Detailseiten der passenden Links. Beide Wege enden im
-// gleichen schema.org-Block.
-async function jsonld(cfg, log) {
+// gleichen schema.org-Datensatz.
+async function haendler(cfg, log) {
   const hinweise = [];
   const produkte = [], verworfen = [];
   const gesehen = new Set();
@@ -155,7 +121,7 @@ async function jsonld(cfg, log) {
     const r = await get(u);
     if (r.status !== 200 || !r.body) { hinweise.push(u.replace(cfg.basis, '') + ': HTTP ' + r.status); continue; }
     if (!bannerHtml) bannerHtml = r.body;
-    nimm(produkteAusJsonLd(r.body, cfg.basis), 'Produktseite');
+    nimm(produkteAusSeite(r.body, cfg.basis), 'Produktseite');
     await sleep(900);
   }
 
@@ -167,9 +133,9 @@ async function jsonld(cfg, log) {
       log('    Suche: HTTP ' + r.status);
     } else {
       if (!bannerHtml) bannerHtml = r.body;
-      const ausListe = nimm(produkteAusJsonLd(r.body, cfg.basis), 'Trefferliste');
+      const ausListe = nimm(produkteAusSeite(r.body, cfg.basis), 'Trefferliste');
       // Kein Preis in der Liste: den Detailseiten nachgehen, aber gedeckelt.
-      if (!ausListe) {
+      if (!ausListe && (cfg.maxDetailseiten || 0) > 0) {
         const links = linksMitModell(r.body, cfg.basis, CFG.modellRe)
           .filter(u => !CFG.ausschlussRe.test(u.replace(/[-_/]/g, ' ')))
           .slice(0, cfg.maxDetailseiten || 5);
@@ -177,7 +143,7 @@ async function jsonld(cfg, log) {
         for (const u of links) {
           const d = await get(u);
           if (d.status !== 200 || !d.body) { hinweise.push(u.replace(cfg.basis, '') + ': HTTP ' + d.status); continue; }
-          nimm(produkteAusJsonLd(d.body, cfg.basis), 'Detailseite');
+          nimm(produkteAusSeite(d.body, cfg.basis), 'Detailseite');
           await sleep(900);
         }
       }
@@ -287,40 +253,29 @@ function sammleBanner(html) {
 }
 
 // ------------------------------------------------------------------ Shops
-// Reihenfolge ist die Meldereihenfolge: der Herstellershop zuerst, weil er
-// die Aktionen ankuendigt, die die Haendler erst Tage spaeter mitgehen.
+// Nur was von einem Runner aus messbar geht. Was geprueft und verworfen
+// wurde, steht im README - nachpruefbar mit diag.js.
 const SHOPS = {
   bambulab: {
-    name: 'Bambu Lab Store EU',
+    // Cloudflare leitet eu.store nach IP-Standort um; von einem
+    // GitHub-Runner landet jede Anfrage auf dem US-Shop. Der Name sagt das,
+    // damit keine Meldung einen USD-Betrag als deutschen Preis ausgibt.
+    name: 'Bambu Lab Store (US-Ansicht)',
     basis: 'https://eu.store.bambulab.com',
-    typ: shopify,
-    suche: 'H2D',
-    // Geprueft am 26.09.2026 - siehe README. Handles bleiben als
-    // Rueckfallweg drin, falls die Suche einmal nichts ausliefert.
-    handles: ['h2d', 'h2d-combo', 'h2d-laser-full-combo', 'h2d-pro'],
-    sammlung: '3d-printer'
+    typ: bambu,
+    sitemap: '/sitemap_products_1.xml',
+    seiten: ['/products/h2d'],
+    hinweis: 'Preise des US-Shops - der Runner steht in den USA. Als Fruehwarnung brauchbar, weil Bambu seine Aktionen global faehrt.'
   },
-  jake3d: {
-    name: '3DJake',
-    basis: 'https://www.3djake.de',
-    typ: jsonld,
-    suchUrl: 'https://www.3djake.de/catalogsearch/result/?q=bambu+lab+h2d',
-    maxDetailseiten: 5
-  },
-  igo3d: {
-    name: 'iGo3D',
-    basis: 'https://www.igo3d.com',
-    typ: jsonld,
-    suchUrl: 'https://www.igo3d.com/search?search=bambu%20lab%20h2d',
-    maxDetailseiten: 5
-  },
-  geizhals: {
-    name: 'Geizhals',
-    basis: 'https://geizhals.de',
-    typ: jsonld,
-    suchUrl: 'https://geizhals.de/?fs=bambu+lab+h2d&hloc=de&in=',
-    maxDetailseiten: 4
+  reichelt: {
+    name: 'reichelt',
+    basis: 'https://www.reichelt.de',
+    typ: haendler,
+    suchUrl: 'https://www.reichelt.de/de/de/shop/suche/bambu%20lab%20h2d',
+    // Die Trefferliste traegt Preis, Verfuegbarkeit und Adresse als
+    // Microdata schon mit - Detailseiten sind nicht noetig.
+    maxDetailseiten: 0
   }
 };
 
-module.exports = { SHOPS, istModell, warumNicht, sammleBanner, ausShopifyProdukt, AKTION_RE };
+module.exports = { SHOPS, istModell, warumNicht, sammleBanner, AKTION_RE, bambu, haendler };

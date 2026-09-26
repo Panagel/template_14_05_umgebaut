@@ -3,7 +3,7 @@
 // notify.js - so kann der Scan auch ohne Secrets geprobt werden.
 const fs = require('fs');
 const path = require('path');
-const { median, eur } = require('./lib.js');
+const { median, geld } = require('./lib.js');
 const { SHOPS } = require('./shops.js');
 const CFG = require('./config.js');
 
@@ -114,7 +114,13 @@ async function main() {
 
     // ---- Signale 1, 2 und 4: Preis, Rabatt, Lieferbarkeit --------------
     for (const p of erg.produkte) {
-      const alt = st.produkte[p.id];
+      // Die Waehrung gehoert in den Schluessel. Derselbe Shop antwortet je
+      // nach Standort des Runners in USD oder EUR; ohne diese Trennung
+      // waere der erste Wechsel ein Preissturz von 15 Prozent, den es nie
+      // gegeben hat.
+      const id = p.id + '|' + (p.waehrung || '?');
+      const g = c => geld(c, p.waehrung);
+      const alt = st.produkte[id];
       const rab = rabattVon(p);
       const gruende = [];
       let typ = null;
@@ -122,20 +128,20 @@ async function main() {
       if (!alt) {
         // Erstsichtung: Grundlage anlegen, nicht bewerten. Nur wenn der Shop
         // vorher schon geliefert hat, ist eine neue Variante eine Nachricht.
-        st.produkte[p.id] = {
-          name: p.name, url: p.url,
+        st.produkte[id] = {
+          name: p.name, url: p.url, waehrung: p.waehrung,
           verlauf: [{ datum: heute, jetzt: p.jetzt, vorher: p.vorher, rabatt: rab, verfuegbar: p.verfuegbar }],
           bestpreis: p.jetzt, bestpreisDatum: heute,
           gemeldeterPreis: null, letzterRabatt: rab, verfuegbar: p.verfuegbar,
           zuletztGesehen: heute
         };
-        log('   + ' + p.name + '  ' + eur(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
+        log('   + ' + p.name + '  ' + g(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
             (st.laeufe > 0 ? '  NEU' : '  erfasst'));
         if (st.laeufe > 0 && CFG.neueVariantenMelden) {
           meldungen.push({
             typ: 'neu', shop: cfg.name, url: p.url || cfg.basis,
             titel: cfg.name + ': ' + p.name + ' neu im Shop',
-            gruende: ['Erstmals gelistet zu ' + eur(p.jetzt) + (rab ? ' (-' + rab + '% gegen ' + eur(p.vorher) + ')' : '')],
+            gruende: ['Erstmals gelistet zu ' + g(p.jetzt) + (rab ? ' (-' + rab + '% gegen ' + g(p.vorher) + ')' : '')],
             produkte: [zeile(p, rab, p.jetzt)]
           });
         }
@@ -148,24 +154,24 @@ async function main() {
       const istRutsch = bGrund && p.jetzt <= Math.round(bGrund * (1 - CFG.preisSprungProzent / 100));
 
       if (istBestpreis && CFG.bestpreisMelden) {
-        gruende.push('Neuer Tiefstand: ' + eur(p.jetzt) + ' (bisher ' + eur(alt.bestpreis) +
+        gruende.push('Neuer Tiefstand: ' + g(p.jetzt) + ' (bisher ' + g(alt.bestpreis) +
                      ' am ' + (alt.bestpreisDatum || '?') + ')');
       }
       if (istRutsch) {
-        gruende.push('Preis ' + eur(bGrund) + ' -> ' + eur(p.jetzt) +
+        gruende.push('Preis ' + g(bGrund) + ' -> ' + g(p.jetzt) +
                      ' (-' + Math.round((1 - p.jetzt / bGrund) * 100) + '% gegen den Median der letzten Laeufe)');
       }
       // Ein neu ausgewiesener oder tieferer Streichpreisrabatt ist ein
       // eigenes Signal: er zeigt, dass der Shop selbst von Aktion spricht.
       if (rab !== null && rab >= CFG.rabattMinProzent && (alt.letzterRabatt === null || alt.letzterRabatt === undefined || rab > alt.letzterRabatt)) {
-        gruende.push('Shop weist -' + rab + '% aus: ' + eur(p.vorher) + ' -> ' + eur(p.jetzt));
+        gruende.push('Shop weist -' + rab + '% aus: ' + g(p.vorher) + ' -> ' + g(p.jetzt));
       }
       if (gruende.length) typ = 'preis';
 
       // Meldebremse: dieselbe Senkung nicht jeden Lauf wiederholen. Erst ein
       // noch tieferer Preis meldet erneut.
       if (typ === 'preis' && CFG.nurTieferMelden && typeof alt.gemeldeterPreis === 'number' && p.jetzt >= alt.gemeldeterPreis) {
-        log('   = ' + p.name + '  ' + eur(p.jetzt) + '  (schon gemeldet)');
+        log('   = ' + p.name + '  ' + g(p.jetzt) + '  (schon gemeldet)');
         gruende.length = 0;
         typ = null;
       }
@@ -177,17 +183,18 @@ async function main() {
       }
 
       if (typ) {
+        if (cfg.hinweis) gruende.push(cfg.hinweis);
         meldungen.push({
           typ: typ, shop: cfg.name, url: p.url || cfg.basis,
-          titel: cfg.name + ': ' + p.name + (typ === 'preis' ? ' fuer ' + eur(p.jetzt) : ' wieder lieferbar'),
+          titel: cfg.name + ': ' + p.name + (typ === 'preis' ? ' fuer ' + g(p.jetzt) : ' wieder lieferbar'),
           gruende: gruende,
           produkte: [zeile(p, rab, Math.min(p.jetzt, alt.bestpreis || p.jetzt))]
         });
-        log('   ! ' + p.name + '  ' + eur(p.jetzt) + '  ' + gruende.join(' | '));
+        log('   ! ' + p.name + '  ' + g(p.jetzt) + '  ' + gruende.join(' | '));
         if (typ === 'preis') alt.gemeldeterPreis = p.jetzt;
       } else if (!gruende.length) {
-        log('   . ' + p.name + '  ' + eur(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
-            '  [Tief ' + eur(alt.bestpreis) + ']');
+        log('   . ' + p.name + '  ' + g(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
+            '  [Tief ' + g(alt.bestpreis) + ']');
       }
 
       // Steigt der Preis wieder ueber den gemeldeten Stand, ist die Bremse
@@ -253,9 +260,10 @@ async function main() {
 }
 
 function zeile(p, rab, bestpreis) {
+  const g = c => geld(c, p.waehrung);
   return {
-    name: p.name, jetzt: eur(p.jetzt), vorher: p.vorher ? eur(p.vorher) : null,
-    rabatt: rab, bestpreis: bestpreis ? eur(bestpreis) : null,
+    name: p.name, jetzt: g(p.jetzt), vorher: p.vorher ? g(p.vorher) : null,
+    rabatt: rab, bestpreis: bestpreis ? g(bestpreis) : null,
     verfuegbar: p.verfuegbar, url: p.url
   };
 }

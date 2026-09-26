@@ -6,17 +6,44 @@ module.exports = {
   // damit spaetere Ableger (H2D Pro, H2D Combo) von allein mitlaufen.
   modellRe: /\bH2D\b/i,
 
-  // Zubehoer, Ersatzteile und Garantieverlaengerungen tragen denselben
-  // Modellnamen. Was hier passt, ist kein Drucker.
-  ausschlussRe: /\b(d[uü]se|nozzle|hotend|heatbed|bauplatte|bed\s*plate|build\s*plate|platte|sheet|filament|spool|spule|filter|riemen|belt|lüfter|l[uü]fter|fan|kamera|camera|glas|glass|brille|goggles|schutz|cover|deckel|door|t[uü]r|schraube|screw|adapter|kabel|cable|halter|holder|mount|bag|tasche|aufkleber|sticker|matte|mat|reiniger|cleaner|wartung|maintenance|ersatz|spare|kit|set\s*of|zubeh[oö]r|accessor|garantie|warranty|protection\s*plan|versand|shipping|gutschein|gift\s*card)\b/i,
+  // Dasselbe fuer die Adressen in der Sitemap des Herstellershops: der
+  // Kurzname muss mit dem Modell beginnen. "h2d" und "h2d-pro" passen,
+  // "dual-extruder-unit-h2d-h2c" nicht - Zubehoer traegt den Modellnamen
+  // hinten.
+  modellSlugRe: /^h2d(?:[-_][a-z0-9-]*)?$/i,
 
-  // Plausible Preisspanne eines Geraets in Cent. Der wirksamste Filter
-  // gegen Zubehoer: Duesen kosten zweistellig, Drucker vierstellig.
+  // Zubehoer, Ersatzteile und Garantien tragen denselben Modellnamen. Was
+  // hier passt, ist kein Drucker.
+  //
+  // Zwei Sorten Treffer, und die zweite ist der Grund, warum die Liste so
+  // aussieht: englische Bezeichnungen stehen als eigene Woerter da
+  // ("Nozzle", "Build Plate") und bekommen Wortgrenzen. Deutsche
+  // Zusammensetzungen haengen das Grundwort hinten an - vor dem "modul" in
+  // "Lasermodul" ist keine Wortgrenze, \bmodul\b greift dort also nicht.
+  // Diese Grundwoerter stehen deshalb mit offenem Vorderteil.
+  ausschlussRe: new RegExp([
+    '\\b(?:nozzle|hotend|heatbed|bed\\s*plate|build\\s*plate|sheet|filament|spool|belt|fan',
+    '|camera|goggles|cover|door|screw|adapter|holder|mount|bag|sticker|mat|cleaner|maintenance',
+    '|spare|kit|set|set\\s*of|accessor|warranty|protection\\s*plan|shipping|gift\\s*card|tube',
+    '|unit|board|sensor|module|upgrade|refill|ptfe|zubeh[oö]r|ersatz|garantie|wartung|schutz',
+    '|deckel|t[uü]r|schraube|spule|aufkleber|nachr[uü]st|versand|gutschein)\\b',
+    '|[a-zäöüß]*(?:d[uü]se|modul|platte|platine|kabel|matte|riemen|filter|halter|tasche|schlauch',
+    '|reiniger|bl[oö]cker|geh[aä]use|glas|brille|beutel|lager|einheit)n?\\b',
+    // Und andersherum: "Garantieverlaengerung" haengt hinten an, nicht vorn.
+    '|\\b(?:garantie|versicherung|wartung|schutz|versand|zubeh[oö]r)[a-zäöüß]*\\b'
+  ].join(''), 'i'),
+
+  //
+  // Gemessen am 26.09.2026: das billigste Geraet stand bei 1.549, das
+  // teuerste (H2D Pro) bei 2.949. Die Spanne ist mit Absicht weit, damit
+  // auch eine ungewoehnlich tiefe Aktion noch hineinfaellt.
   preisMin: 80000,             //    800 EUR
   preisMax: 900000,            //  9.000 EUR
 
   // Welche Shops laufen. Zum Abschalten auf false setzen.
-  aktiv: { bambulab: true, jake3d: true, igo3d: true, geizhals: true },
+  // Weitere Shops stehen in shops.js; welche davon ein Runner ueberhaupt
+  // lesen kann, zeigt "node diag.js".
+  aktiv: { bambulab: true, reichelt: true },
 
   // --- Signal 1: Preis ---------------------------------------------------
   // Gemessen wird gegen den Median der letzten Laeufe, nicht gegen gestern:
