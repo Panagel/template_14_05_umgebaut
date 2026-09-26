@@ -1,9 +1,9 @@
 # H2D-Watcher
 
 Meldet, wenn der **Bambu Lab H2D** guenstiger wird — im Herstellershop und bei
-den Haendlern. Kein Sortiments-Ticker: der Watcher verfolgt **ein Geraet** mit
-allen Ausbaustufen und meldet sich, wenn sich Preis, Rabatt oder Lieferbarkeit
-aendern.
+den Haendlern. Kein Sortiments-Ticker: der Watcher verfolgt **das Geraet selbst
+und das Geraet mit AMS 2 Pro** und meldet sich, wenn sich Preis, Rabatt oder
+Lieferbarkeit aendern.
 
 Laeuft in GitHub Actions, zweimal taeglich. Der PC bleibt aus.
 
@@ -11,6 +11,38 @@ Gleiche Bauart wie der Motorrad-Sale-Watcher: Node ohne Abhaengigkeiten,
 Zustand im Repo, Push per ntfy und Telegram. Nur die Signale sind andere —
 bei einem einzelnen Geraet zaehlt der Preis selbst, nicht die Breite eines
 Sales.
+
+## Was beobachtet wird
+
+Der H2D wird in mehreren Ausbaustufen verkauft. Beobachtet werden die beiden,
+um die es geht:
+
+| Ausbaustufe | beobachtet | Stand 26.09.2026 |
+|---|---|---|
+| H2D allein | **ja** | 1.549 EUR (reichelt) · 1.549 USD (Hersteller) |
+| H2D mit AMS 2 Pro | **ja** | 1.749 EUR (reichelt) · 1.749 USD (Hersteller) |
+| H2D mit AMS 2 Pro, aufgearbeitet | **ja** | 1.469 USD (Hersteller) |
+| H2D Laser Full Combo 10 W | nein | 2.149 |
+| H2D Laser Full Combo 40 W | nein | 2.549 / 2.699 |
+| H2D mit zwei AMS 2 Pro | nein | 1.949 USD |
+| H2D mit AMS HT | nein | 1.849 USD |
+| H2D Pro | nein | 2.949 EUR |
+
+Was auf *nein* steht, kommt gar nicht erst in den Zustand: keine Meldung,
+keine Zeile im Log, kein Tiefstpreis. Der Schalter ist `klassenAktiv` in
+[`config.js`](config.js), ein Wort auf `true` genuegt. Fuer das Pro-Modell und
+fuer aufgearbeitete Geraete gibt es je einen eigenen (`proMelden`,
+`gebrauchtMelden`).
+
+Aufgearbeitete Geraete bleiben mit drin, weil sie dasselbe Geraet sind und
+derzeit der guenstigste Weg dazu — sie laufen als eigene Vergleichsgruppe und
+tragen in jeder Meldung ein `(aufgearbeitet)`, damit sie nie mit Neuware
+verwechselt werden.
+
+Wird eine Stufe stillgelegt, bleibt ihre Bestmarke im Zustand stehen und wird
+nur nicht mehr angezeigt. Wer sie wieder einschaltet, hat die Vorgeschichte
+noch; erst nach 120 Laufen ohne Sichtung raeumt der Watcher die Variante
+endgueltig aus.
 
 ## Fuenf Signale
 
@@ -119,44 +151,36 @@ So sieht ein guter Lauf aus — echte Ausgabe vom 26.09.2026:
 ```
 == Bambu Lab Store (US-Ansicht)
     Sitemap: 3 Modellseite(n) von 1104
-    h2d: 6 Variante(n)
+    h2d: 2 Variante(n), 4 verworfen
     h2d-pro: 0 Variante(n)
-    refurbished-h2d-3d-printer: 1 Variante(n)
+    refurbished-bambu-lab-h2d-3d-printer: 1 Variante(n)
    . Bambu Lab H2D - H2D AMS Combo / Standard  1.749,00 USD  (-13%)  [Tief 1.749,00 USD]
-   . Bambu Lab H2D - H2D Laser Full Combo / 10W  2.149,00 USD  (-16%)
-   . Bambu Lab H2D - H2D Laser Full Combo / 40W  2.699,00 USD  (-16%)
    . Bambu Lab H2D - H2D / standard  1.549,00 USD  (-11%)  [Tief 1.549,00 USD]
-   . Bambu Lab H2D - H2D AMS Combo / Dual AMS 2 Pro Bundle  1.949,00 USD  (-13%)
-   . Bambu Lab H2D - H2D AMS Combo / AMS HT bundle  1.849,00 USD  (-12%)
-   + [Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo  1.469,00 USD  (-16%)  NEU
+   . [Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo  1.469,00 USD  (-16%)
 == reichelt
-    Trefferliste: 5 Geraete
-    5 Geraete, 11 verworfen
+    Trefferliste: 2 Geraete
+    2 Geraete, 14 verworfen
    . 3D Drucker, Bambu Lab H2D  1.549,00 EUR  [Tief 1.549,00 EUR]
-   . 3D Drucker, Bambu Lab H2D Pro  2.949,00 EUR  [Tief 2.949,00 EUR]
    . 3D Drucker, Bambu Lab H2D AMS Combo  1.749,00 EUR  [Tief 1.749,00 EUR]
-   . 3D Drucker, Bambu Lab H2D, 10 W Laser  2.149,00 EUR  [Tief 2.149,00 EUR]
-   . 3D Drucker, Bambu Lab H2D, 40 W Laser  2.549,00 EUR  [Tief 2.549,00 EUR]
 
 Tiefstpreise bisher:
    H2D                                 1.549,00 EUR  reichelt  (2026-09-26)
    H2D                                 1.549,00 USD  Bambu Lab Store (US-Ansicht)
    H2D AMS Combo                       1.749,00 EUR  reichelt  (2026-09-26)
    H2D AMS Combo                       1.749,00 USD  Bambu Lab Store (US-Ansicht)
-   H2D AMS Combo (Dual AMS 2 Pro)      1.949,00 USD  Bambu Lab Store (US-Ansicht)
-   H2D AMS Combo (AMS HT)              1.849,00 USD  Bambu Lab Store (US-Ansicht)
    H2D AMS Combo (aufgearbeitet)       1.469,00 USD  Bambu Lab Store (US-Ansicht)
-   H2D Laser 10 W                      2.149,00 EUR  reichelt  (2026-09-26)
-   H2D Laser 40 W                      2.549,00 EUR  reichelt  (2026-09-26)
-   H2D Pro                             2.949,00 EUR  reichelt  (2026-09-26)
 
-Meldungen: 1 | Shops mit Daten: 2
+Meldungen: 0 | Shops mit Daten: 2
 ```
 
-Zwoelf Varianten in zwoelf Vergleichsgruppen, und man sieht sofort, was der
-Markt macht: reichelt ist beim 40-Watt-Laser 150 EUR unter dem US-Preis, und
-die guenstigste Fassung des Geraets mit AMS ist ein aufgearbeitetes zu
-1.469 USD.
+Fuenf beobachtete Varianten in fuenf Vergleichsgruppen. `4 verworfen` auf der
+Herstellerseite und `14 verworfen` bei reichelt sind die Laserfassungen, das
+Pro-Modell und das Zubehoer — der Watcher sagt also mit, was er bewusst
+liegen laesst.
+
+Ablesbar ist auch, was der Markt macht: beim Geraet selbst und beim Geraet mit
+AMS 2 Pro ist reichelt zahlengleich mit dem US-Shop (1.549 / 1.749), und die
+guenstigste Fassung mit AMS ist ein aufgearbeitetes Geraet zu 1.469 USD.
 
 Die Zeichen am Zeilenanfang sind die Kurzfassung:
 
@@ -167,6 +191,7 @@ Die Zeichen am Zeilenanfang sind die Kurzfassung:
 | `!` | gemeldet, mit Grund dahinter |
 | `=` | Senkung erkannt, aber zu diesem Preis schon gemeldet |
 | `?` | Hinweis oder Stoerung beim Abruf |
+| `-` | Ausbaustufe steht aus, wird uebergangen |
 
 `11 verworfen` bei reichelt sind Lasermodule, Luftreiniger und Zubehoer —
 siehe unten.
@@ -183,8 +208,8 @@ Workflow **Shop-Diagnose** (`diag.js`).
 
 | Shop | Zugriff | Ergebnis | Status |
 |---|---|---|---|
-| Bambu Lab Store | JSON-LD (`ProductGroup`) je Produktseite, Adressen aus der Produkt-Sitemap | 7 Varianten mit Preis, Streichpreis und Lagerstand, aufgearbeitete Geraete inbegriffen | laeuft, **US-Preise** |
-| reichelt | `itemprop`-Microdata in der Trefferliste | 5 Varianten in EUR, mit Lagerstand | laeuft |
+| Bambu Lab Store | JSON-LD (`ProductGroup`) je Produktseite, Adressen aus der Produkt-Sitemap | 7 Varianten mit Preis, Streichpreis und Lagerstand, davon 3 beobachtet | laeuft, **US-Preise** |
+| reichelt | `itemprop`-Microdata in der Trefferliste | 5 Varianten in EUR mit Lagerstand, davon 2 beobachtet | laeuft |
 
 Der Herstellershop ist eine Next.js-Anwendung: im Markup steht fast nichts
 Sichtbares (1,7 MB HTML, 26 000 Zeichen Text), aber jede Produktseite traegt
@@ -197,7 +222,7 @@ Modellseiten. Zwei, deren Kurzname mit dem Modell **beginnt** (`h2d`,
 `h2d-pro`) — das ist die Trennlinie zum Zubehoer, denn
 `dual-extruder-unit-h2d-h2c` traegt den Modellnamen hinten und ist ein
 Ersatzteil. Und eine ueber die zweite, lockere Regel:
-`refurbished-h2d-3d-printer`. Ein spaeteres H2D-Modell taucht so von allein
+`refurbished-bambu-lab-h2d-3d-printer`. Ein spaeteres H2D-Modell taucht so von allein
 auf; geprueft an 18 echten Kurznamen aus der Sitemap.
 
 `h2d-pro` liefert derzeit keine Variante: die Seite antwortet, traegt aber
@@ -322,6 +347,7 @@ Alles in [`config.js`](config.js).
 
 | Zuviel Meldungen? | Zuwenig? |
 |---|---|
+| eine Ausbaustufe in `klassenAktiv` auf `false` | auf `true` |
 | `preisSprungProzent` hoch | runter |
 | `tiefstpreisMelden` auf `false` | auf `true` lassen |
 | `bestpreisMelden` auf `false` | auf `true` lassen |
@@ -330,7 +356,8 @@ Alles in [`config.js`](config.js).
 | `verfuegbarkeitMelden` auf `false` | auf `true` lassen |
 
 Ein anderes Geraet beobachten? `modellRe`, `modellSlugRe`, `varianten`,
-`proRe` und die Preisspanne umstellen — der Rest ist geraeteunabhaengig.
+`klassenAktiv`, `proRe` und die Preisspanne umstellen — der Rest ist
+geraeteunabhaengig.
 
 ## Dateien
 
@@ -341,10 +368,10 @@ Ein anderes Geraet beobachten? `modellRe`, `modellSlugRe`, `varianten`,
 | `lib.js` | HTTP mit Browser-Kopfzeilen, JSON-LD, Microdata, Preis- und Waehrungshelfer |
 | `notify.js` | Push ueber ntfy und Telegram |
 | `testpush.js` | Testmeldung, ohne auf eine echte Senkung zu warten |
-| `config.js` | Schwellen, Modellfilter und Shop-Schalter |
+| `config.js` | Schwellen, Modell- und Stufenfilter, Shop-Schalter |
 | `diag.js` | prueft, welche Shops dieses Netz durchlaesst |
 | `data/state.json` | Vorgeschichte je Variante, Tiefstpreise je Gruppe, Kampagnen |
-| `data/meldungen.json` | Ergebnis des letzten Laufs |
+| `data/meldungen.json` | Ergebnis des letzten Laufs samt Tiefstpreis-Register |
 
 `data/state.json` ist die Grundlage — **nicht loeschen**, sonst faengt die
 Bewertung bei null an: jede Variante gilt wieder als Erstsichtung, und alle
