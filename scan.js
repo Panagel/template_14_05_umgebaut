@@ -88,7 +88,7 @@ async function main() {
       log('   FEHLER: ' + e.message);
       erg = { produkte: [], banner: [], hinweise: ['Ausnahme: ' + e.message] };
     }
-    for (const h of (erg.hinweise || [])) log('   ! ' + h);
+    for (const h of (erg.hinweise || [])) log('   ? ' + h);
 
     // Kein Abbruch, wenn ein Shop schweigt - die anderen laufen weiter.
     // Aber dauerhafte Stille muss auffallen, sonst haelt man sie fuer
@@ -111,6 +111,16 @@ async function main() {
     shopsMitDaten++;
 
     const zeilen = [];
+
+    // Welche Kennung steht schon in welcher Waehrung im Zustand? Wechselt
+    // ein Shop die Waehrung - weil der Runner in einer anderen Region
+    // steht -, sind alle Varianten formal neu. Als "neu im Shop" waere das
+    // falsch und waeren es auf einen Schlag sechs Meldungen.
+    const bekannteWaehrung = new Map();
+    for (const k of Object.keys(st.produkte)) {
+      const trenner = k.lastIndexOf('|');
+      if (trenner > 0) bekannteWaehrung.set(k.slice(0, trenner), k.slice(trenner + 1));
+    }
 
     // ---- Signale 1, 2 und 4: Preis, Rabatt, Lieferbarkeit --------------
     for (const p of erg.produkte) {
@@ -135,9 +145,12 @@ async function main() {
           gemeldeterPreis: null, letzterRabatt: rab, verfuegbar: p.verfuegbar,
           zuletztGesehen: heute
         };
+        const altWaehrung = bekannteWaehrung.get(p.id);
+        const nurWaehrung = altWaehrung && altWaehrung !== (p.waehrung || '?');
         log('   + ' + p.name + '  ' + g(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
-            (st.laeufe > 0 ? '  NEU' : '  erfasst'));
-        if (st.laeufe > 0 && CFG.neueVariantenMelden) {
+            (nurWaehrung ? '  Waehrungswechsel ' + altWaehrung + ' -> ' + (p.waehrung || '?') + ', Grundlage faengt neu an'
+                         : (st.laeufe > 0 ? '  NEU' : '  erfasst')));
+        if (st.laeufe > 0 && CFG.neueVariantenMelden && !nurWaehrung) {
           meldungen.push({
             typ: 'neu', shop: cfg.name, url: p.url || cfg.basis,
             titel: cfg.name + ': ' + p.name + ' neu im Shop',
@@ -170,10 +183,12 @@ async function main() {
 
       // Meldebremse: dieselbe Senkung nicht jeden Lauf wiederholen. Erst ein
       // noch tieferer Preis meldet erneut.
+      let gebremst = false;
       if (typ === 'preis' && CFG.nurTieferMelden && typeof alt.gemeldeterPreis === 'number' && p.jetzt >= alt.gemeldeterPreis) {
-        log('   = ' + p.name + '  ' + g(p.jetzt) + '  (schon gemeldet)');
+        log('   = ' + p.name + '  ' + g(p.jetzt) + '  (schon gemeldet zu ' + g(alt.gemeldeterPreis) + ')');
         gruende.length = 0;
         typ = null;
+        gebremst = true;
       }
 
       // Lieferbarkeit: aus "nicht lieferbar" wird "lieferbar".
@@ -192,7 +207,7 @@ async function main() {
         });
         log('   ! ' + p.name + '  ' + g(p.jetzt) + '  ' + gruende.join(' | '));
         if (typ === 'preis') alt.gemeldeterPreis = p.jetzt;
-      } else if (!gruende.length) {
+      } else if (!gebremst) {
         log('   . ' + p.name + '  ' + g(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
             '  [Tief ' + g(alt.bestpreis) + ']');
       }

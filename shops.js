@@ -86,14 +86,15 @@ async function bambu(cfg, log) {
       log('    ' + url.split('/').pop() + ': HTTP ' + r.status);
       continue;
     }
-    let neu = 0;
+    let neu = 0, verworfenHier = 0;
     for (const p of produkteAusSeite(r.body, cfg.basis)) {
       const key = p.id || p.url;
       if (gesehen.has(key)) continue;
       gesehen.add(key);
-      if (istModell(p)) { produkte.push(p); neu++; } else verworfen.push(p);
+      if (istModell(p)) { produkte.push(p); neu++; } else { verworfen.push(p); verworfenHier++; }
     }
-    log('    ' + url.split('/').pop() + ': ' + neu + ' Variante(n)');
+    log('    ' + url.split('/').pop() + ': ' + neu + ' Variante(n)' +
+        (verworfenHier ? ', ' + verworfenHier + ' verworfen' : ''));
     await sleep(700);
   }
 

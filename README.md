@@ -1,11 +1,274 @@
 # H2D-Watcher
 
-Meldet, wenn der **Bambu Lab H2D** im Preis faellt — im Herstellershop und bei
-den Haendlern. Kein Sortiments-Ticker: der Watcher verfolgt ein Geraet und
-seine Varianten, und melden tut er, wenn sich am Preis, am Rabatt oder an der
-Lieferbarkeit etwas aendert.
+Meldet, wenn der **Bambu Lab H2D** guenstiger wird — im Herstellershop und bei
+den Haendlern. Kein Sortiments-Ticker: der Watcher verfolgt **ein Geraet** mit
+allen Ausbaustufen und meldet sich, wenn sich Preis, Rabatt oder Lieferbarkeit
+aendern.
 
 Laeuft in GitHub Actions, zweimal taeglich. Der PC bleibt aus.
 
-Einrichtung, Shop-Status und Schwellen: siehe unten (wird nach dem ersten
-Diagnoselauf mit gemessenen Zahlen gefuellt).
+Gleiche Bauart wie der Motorrad-Sale-Watcher: Node ohne Abhaengigkeiten,
+Zustand im Repo, Push per ntfy und Telegram. Nur die Signale sind andere —
+bei einem einzelnen Geraet zaehlt der Preis selbst, nicht die Breite eines
+Sales.
+
+## Vier Signale
+
+**1. Preis.** Je Variante wird der aktuelle Preis gegen den **Median der
+letzten 14 Laeufe** gehalten, nicht gegen gestern: ein einzelner Fehlgriff
+beim Lesen soll keinen Alarm ausloesen. Gemeldet wird ab 4 % Abweichung
+(`preisSprungProzent`) und immer bei einem neuen Tiefstand.
+
+Dieselbe Senkung meldet **einmal**. Erst ein noch tieferer Preis meldet
+erneut (`nurTieferMelden`) — sonst pusht ein zwei Wochen laufender Sale jeden
+Morgen aufs Neue. Steigt der Preis wieder, ist die Bremse geloest.
+
+**2. Ausgewiesener Rabatt.** Der Bambu-Shop schreibt seinen Streichpreis in
+die Seite (`StrikethroughPrice`). Taucht einer neu auf oder wird er tiefer,
+ist das ein eigenes Signal: dann spricht der Shop selbst von Aktion.
+
+```
+Bambu Lab H2D - H2D / standard             1.549,00 USD statt 1.749,00 USD  -11%
+Bambu Lab H2D - H2D Laser Full Combo / 40W 2.699,00 USD statt 3.199,00 USD  -16%
+```
+
+Haendler fuehren praktisch nie einen Streichpreis. Dort greift nur Signal 1 —
+was kein Verlust ist, denn die eigene Vorgeschichte ist der ehrlichere
+Vergleich.
+
+**3. Beworbene Kampagne.** Aktionen stehen als Fliesstext im Seitenkopf, oft
+samt Gutscheincode. Gemeldet wird eine Aktion einmal; erst wenn sie laenger
+als 30 Tage verschwunden war, gilt sie wieder als neu
+(`kampagneStillTage`).
+
+Dauerwerbung fliegt raus. Der Bambu-Shop bewirbt im Kopf staendig
+Verbrauchsmaterial — `Price Drop Alert! Mix 2+ rolls for bulk discounts`,
+`25% off Laser Essentials`, `10% of your friend's printer purchase` —, und
+keine dieser Zeilen hat mit dem Druckerpreis zu tun. Werbung, die
+Verbrauchsmaterial oder Zubehoerpakete nennt und kein Geraet, wird verworfen.
+`price drop` steht deshalb auch nicht in der Aktionsliste: eine Preissenkung
+erkennt Signal 1 an den Zahlen, und zwar genauer.
+
+**4. Lieferbarkeit und neue Varianten.** Aus *nicht lieferbar* wird
+*lieferbar* — eigene Nachricht. Taucht eine Variante neu auf (etwa ein
+spaeteres Pro-Modell), ebenfalls, aber nur wenn der Shop vorher schon Daten
+geliefert hat: beim ersten Lauf ist alles neu, und niemand will elf
+Nachrichten auf einmal.
+
+## Einrichtung
+
+1. Unter *Settings → Secrets and variables → Actions* setzen:
+
+   | Secret | Pflicht | Zweck |
+   |---|---|---|
+   | `NTFY_TOPIC` | ja | ntfy-Topic, z. B. `h2d-preis-a1b2c3`. Frei waehlbar, aber **nicht erratbar machen** — jeder mit dem Namen liest mit. |
+   | `NTFY_TOKEN` | nein | nur fuer geschuetzte ntfy-Topics |
+   | `TELEGRAM_TOKEN` | nein | Bot-Token, falls du zusaetzlich Telegram willst |
+   | `TELEGRAM_CHAT_ID` | nein | Ziel-Chat |
+
+2. ntfy-App installieren und dasselbe Topic abonnieren.
+3. Unter *Actions* den Workflow **H2D-Preisscan** einmal von Hand starten,
+   mit `testpush = true`. Dann kommt sofort eine Testmeldung aufs Handy, mit
+   dem Stand des letzten echten Laufs im Anhang.
+
+Kein `npm install` noetig — der Watcher benutzt nur Node-Bordmittel.
+
+Zwei Dinge, die GitHub nebenbei bestimmt: Zeitplaene laufen **nur auf dem
+Standardbranch** (hier `claude/h2d-bambulab-drucker-setup-ygc3pv`), und in
+einem Repo ohne Aktivitaet schaltet GitHub den Zeitplan nach 60 Tagen ab. Der
+Scan committet bei jedem Lauf seinen Zustand, also zaehlt das als Aktivitaet.
+
+## Woran du Erfolg erkennst
+
+```bash
+node scan.js
+```
+
+So sieht ein guter Lauf aus — echte Ausgabe vom 26.09.2026:
+
+```
+== Bambu Lab Store (US-Ansicht)
+    Sitemap: 2 Modellseite(n) von 1104
+    h2d: 6 Variante(n)
+    h2d-pro: 0 Variante(n)
+   . Bambu Lab H2D - H2D AMS Combo / Standard  1.749,00 USD  (-13%)  [Tief 1.749,00 USD]
+   . Bambu Lab H2D - H2D Laser Full Combo / 10W  2.149,00 USD  (-16%)  [Tief 2.149,00 USD]
+   . Bambu Lab H2D - H2D Laser Full Combo / 40W  2.699,00 USD  (-16%)  [Tief 2.699,00 USD]
+   . Bambu Lab H2D - H2D / standard  1.549,00 USD  (-11%)  [Tief 1.549,00 USD]
+   . Bambu Lab H2D - H2D AMS Combo / Dual AMS 2 Pro Bundle  1.949,00 USD  (-13%)
+   . Bambu Lab H2D - H2D AMS Combo / AMS HT bundle  1.849,00 USD  (-12%)
+== reichelt
+    Trefferliste: 5 Geraete
+    5 Geraete, 11 verworfen
+   . 3D Drucker, Bambu Lab H2D  1.549,00 EUR  [Tief 1.549,00 EUR]
+   . 3D Drucker, Bambu Lab H2D Pro  2.949,00 EUR  [Tief 2.949,00 EUR]
+   . 3D Drucker, Bambu Lab H2D AMS Combo  1.749,00 EUR  [Tief 1.749,00 EUR]
+   . 3D Drucker, Bambu Lab H2D, 10 W Laser  2.149,00 EUR  [Tief 2.149,00 EUR]
+   . 3D Drucker, Bambu Lab H2D, 40 W Laser  2.549,00 EUR  [Tief 2.549,00 EUR]
+
+Meldungen: 0 | Shops mit Daten: 2
+```
+
+Die Zeichen am Zeilenanfang sind die Kurzfassung:
+
+| Zeichen | Bedeutung |
+|---|---|
+| `.` | unveraendert |
+| `+` | erstmals erfasst |
+| `!` | gemeldet, mit Grund dahinter |
+| `=` | Senkung erkannt, aber zu diesem Preis schon gemeldet |
+| `?` | Hinweis oder Stoerung beim Abruf |
+
+`11 verworfen` bei reichelt sind Lasermodule, Luftreiniger und Zubehoer —
+siehe unten.
+
+**Fehlerbild:** `HTTP 403` heisst, der Shop sperrt die Runner-IPs.
+`HTTP 0` ist ein Verbindungsabbruch. Liefert ein Shop dreimal in Folge keine
+Preise, meldet der Watcher das aktiv aufs Handy — Stille darf nicht mit
+"keine Aktion" verwechselt werden.
+
+## Die Shops
+
+Gemessen am 26.09.2026 von einem GitHub-Runner aus, nachpruefbar mit dem
+Workflow **Shop-Diagnose** (`diag.js`).
+
+| Shop | Zugriff | Ergebnis | Status |
+|---|---|---|---|
+| Bambu Lab Store | JSON-LD (`ProductGroup`) je Produktseite, Adressen aus der Produkt-Sitemap | 6 Varianten mit Preis, Streichpreis und Lagerstand | laeuft, **US-Preise** |
+| reichelt | `itemprop`-Microdata in der Trefferliste | 5 Varianten in EUR, mit Lagerstand | laeuft |
+
+Der Herstellershop ist eine Next.js-Anwendung: im Markup steht fast nichts
+Sichtbares (1,7 MB HTML, 26 000 Zeichen Text), aber jede Produktseite traegt
+einen vollstaendigen schema.org-Block. Das ist stabiler als jedes Markup —
+Klassennamen aendern sich beim Theme-Wechsel, schema.org bleibt, weil es fuer
+Google gepflegt wird.
+
+Welche Produktseiten es gibt, sagt die Sitemap: 1104 Adressen, davon zwei,
+deren Kurzname mit dem Modell **beginnt** (`h2d`, `h2d-pro`). Das ist die
+Trennlinie zum Zubehoer — `dual-extruder-unit-h2d-h2c` traegt den
+Modellnamen hinten und ist ein Ersatzteil. Ein spaeteres H2D-Modell taucht so
+von allein auf.
+
+`h2d-pro` liefert derzeit keine Variante: die Seite antwortet, traegt aber
+keinen Preisblock. Den Pro-Preis kennt der Watcher trotzdem — ueber reichelt.
+
+### Warum der Herstellershop US-Preise liefert
+
+`eu.store.bambulab.com` antwortet einem GitHub-Runner nicht. Cloudflare
+leitet nach IP-Standort um, gemessen aus einem Runner heraus:
+
+```
+HTTP 302
+location: https://us.store.bambulab.com/products/h2d
+server: cloudflare
+cf-ray: a411b50c7d3c7c36-IAD
+```
+
+Kein `Set-Cookie`, also auch kein Schalter, den man zuruecksetzen koennte.
+Erfolglos versucht: `?region=eu`, `?country=DE`, die Cookies `region`,
+`bbl_region`, `store-region`, `bbl-region`, `NEXT_LOCALE`,
+`Accept-Language: de-DE` allein, die Sprachpfade `/de/` und `/en/` und der
+globale Host `store.bambulab.com`. Alles landet auf `us.store`. Auch die
+Sitemap. Es ist **IP-Geolocation, kein Header-Problem** — von einem
+deutschen Anschluss aus funktioniert der EU-Shop normal.
+
+Daraus folgen zwei Dinge:
+
+- Der Shop heisst im Watcher **"Bambu Lab Store (US-Ansicht)"**, und jede
+  Meldung von ihm traegt den Hinweis mit. So gibt niemand einen USD-Betrag
+  fuer einen deutschen Preis aus.
+- Als Signal taugt er trotzdem, und zwar als **Fruehwarnung**: Bambu faehrt
+  seine Aktionen global, der US-Shop zeigt sie oft zuerst. Die belastbare
+  EUR-Zahl fuer Deutschland liefert reichelt.
+
+Die Waehrung steht deshalb im Zustandsschluessel. Sollte ein Runner doch
+einmal in Europa stehen, faengt die Grundlage fuer die EUR-Preise neu an,
+statt einen Waehrungswechsel als Preissturz von 15 % zu melden.
+
+### Ebenfalls geprueft und verworfen
+
+```
+Geizhals            HTTP 403     sperrt die Runner-IPs
+Conrad              HTTP 403     sperrt die Runner-IPs
+MediaMarkt          HTTP 403     sperrt die Runner-IPs
+Alza                HTTP 403     sperrt die Runner-IPs
+Amazon              HTTP 200     2 242 B, 0 Zeichen sichtbarer Text - Blockseite
+Idealo              HTTP 200     2 606 B, 32 Zeichen - JavaScript-Wall
+Alternate           HTTP 200     "JavaScript ist nicht aktiviert", keine Preise im HTML
+Galaxus             HTTP 200     Preise erst per GraphQL, nichts im HTML
+Coolblue            HTTP 200     nennt das Geraet, Preise erst per JavaScript
+billiger.de         HTTP 200     leitet die Suche auf die Startseite um
+3DJake              HTTP 200     fuehrt das Geraet nicht, nur Zubehoer
+iGo3D               HTTP 200     fuehrt das Geraet nicht, nur Zubehoer
+berrybase           HTTP 200     nennt das Geraet, aber kein Preis im Markup
+```
+
+Die vier 403er sind derselbe Fall wie Louis im Motorrad-Watcher:
+IP-Reputation. Gibt ein Shop die Ranges irgendwann frei, genuegt ein Eintrag
+in `shops.js` und ein Schalter in `config.js`.
+
+### Eigenheiten
+
+**reichelt vergibt Artikelnummern mehrfach.** In der Trefferliste steht in
+jedem Produkt dieselbe `sku`, naemlich die Marke `BAMBU LAB`. Vier von fuenf
+Varianten galten damit als Duplikat und fielen still heraus — der erste
+echte Lauf hat genau das gezeigt. `produkteAusSeite` prueft Kennungen jetzt
+auf Eindeutigkeit und faellt sonst auf Adresse und Namen zurueck.
+
+**Zubehoer traegt denselben Modellnamen.** Duesen, Bauplatten, Lasermodule
+und Garantien heissen alle "… H2D …". Aussortiert wird ueber zwei Wege: einen
+Namensfilter und die Preisspanne von 800 bis 9 000 EUR. Die Preisspanne ist
+der wirksamere der beiden — Duesen kosten zweistellig, Drucker vierstellig.
+
+Der Namensfilter braucht fuer Deutsch eine Extrawurst: `\bmodul\b` greift
+nicht in *Lasermodul*, weil davor keine Wortgrenze steht, und
+*Garantieverlaengerung* haengt hinten dran. Die Liste in `config.js` fuehrt
+Grundwoerter deshalb mit offenem Vorderteil und offenem Hinterteil. Geprueft
+an 23 echten Namen aus beiden Shops.
+
+## Schrauben
+
+Alles in [`config.js`](config.js).
+
+| Zuviel Meldungen? | Zuwenig? |
+|---|---|
+| `preisSprungProzent` hoch | runter |
+| `bestpreisMelden` auf `false` | auf `true` lassen |
+| `rabattMinProzent` hoch | runter |
+| `kampagneMinProzent` hoch | runter |
+| `verfuegbarkeitMelden` auf `false` | auf `true` lassen |
+
+Ein anderes Geraet beobachten? `modellRe`, `modellSlugRe` und die
+Preisspanne umstellen — der Rest ist geraeteunabhaengig.
+
+## Dateien
+
+| Datei | Zweck |
+|---|---|
+| `scan.js` | Hauptlauf: erheben, bewerten, Meldungen schreiben |
+| `shops.js` | Ein Adapter je Zugriffsart plus die Bannersuche |
+| `lib.js` | HTTP mit Browser-Kopfzeilen, JSON-LD, Microdata, Preis- und Waehrungshelfer |
+| `notify.js` | Push ueber ntfy und Telegram |
+| `testpush.js` | Testmeldung, ohne auf eine echte Senkung zu warten |
+| `config.js` | Schwellen, Modellfilter und Shop-Schalter |
+| `diag.js` | prueft, welche Shops dieses Netz durchlaesst |
+| `data/state.json` | Vorgeschichte je Variante: Verlauf, Tiefstand, Kampagnen |
+| `data/meldungen.json` | Ergebnis des letzten Laufs |
+
+`data/state.json` ist die Grundlage — **nicht loeschen**, sonst faengt die
+Bewertung bei null an: jede Variante gilt wieder als Erstsichtung, und
+Tiefstaende von vorher sind vergessen.
+
+## Grenzen
+
+- **Die US-Preise sind kein deutscher Preis.** Sie zeigen, *dass* eine Aktion
+  laeuft, nicht *was* du zahlst. Dafuer ist reichelt da.
+- **Ein Haendler ist ein Haendler, kein Markt.** Der Watcher sieht zwei
+  Quellen, nicht den guenstigsten Anbieter Deutschlands. Die Preisvergleicher,
+  die das koennten, sperren die Runner aus.
+- **Streichpreise sind die Angabe des Shops.** Was der Vergleichspreis wert
+  ist, entscheidet der Shop, nicht der Watcher.
+- **"Lieferbar" ist die Angabe der Seite**, kein Blick ins Lager.
+- Die Bannersuche erkennt Aktionen an Schluesselwoertern. Erfindet ein Shop
+  einen Aktionsnamen, der nicht in `AKTION_RE` steht, faengt ihn nur noch
+  Signal 1 — und das braucht eine spuerbare Senkung.
