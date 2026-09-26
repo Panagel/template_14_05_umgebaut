@@ -1,5 +1,115 @@
 {
- "datum": null,
+ "datum": "2026-09-26",
  "meldungen": [],
- "uebersicht": []
+ "uebersicht": [
+  {
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "produkte": [
+    {
+     "name": "Bambu Lab H2D - H2D AMS Combo / Standard",
+     "jetzt": "1.749,00 USD",
+     "vorher": "1.999,00 USD",
+     "rabatt": 13,
+     "bestpreis": "1.749,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385"
+    },
+    {
+     "name": "Bambu Lab H2D - H2D Laser Full Combo / 10W",
+     "jetzt": "2.149,00 USD",
+     "vorher": "2.549,00 USD",
+     "rabatt": 16,
+     "bestpreis": "2.149,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709390"
+    },
+    {
+     "name": "Bambu Lab H2D - H2D Laser Full Combo / 40W",
+     "jetzt": "2.699,00 USD",
+     "vorher": "3.199,00 USD",
+     "rabatt": 16,
+     "bestpreis": "2.699,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709395"
+    },
+    {
+     "name": "Bambu Lab H2D - H2D / standard",
+     "jetzt": "1.549,00 USD",
+     "vorher": "1.749,00 USD",
+     "rabatt": 11,
+     "bestpreis": "1.549,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709400"
+    },
+    {
+     "name": "Bambu Lab H2D - H2D AMS Combo / Dual AMS 2 Pro Bundle",
+     "jetzt": "1.949,00 USD",
+     "vorher": "2.249,00 USD",
+     "rabatt": 13,
+     "bestpreis": "1.949,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/h2d?id=622679274382356483"
+    },
+    {
+     "name": "Bambu Lab H2D - H2D AMS Combo / AMS HT bundle",
+     "jetzt": "1.849,00 USD",
+     "vorher": "2.099,00 USD",
+     "rabatt": 12,
+     "bestpreis": "1.849,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/h2d?id=622679274382356488"
+    }
+   ]
+  },
+  {
+   "shop": "reichelt",
+   "produkte": [
+    {
+     "name": "3D Drucker, Bambu Lab H2D",
+     "jetzt": "1.549,00 EUR",
+     "vorher": null,
+     "rabatt": null,
+     "bestpreis": "1.549,00 EUR",
+     "verfuegbar": "ja",
+     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245"
+    },
+    {
+     "name": "3D Drucker, Bambu Lab H2D Pro",
+     "jetzt": "2.949,00 EUR",
+     "vorher": null,
+     "rabatt": null,
+     "bestpreis": "2.949,00 EUR",
+     "verfuegbar": "ja",
+     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_pro-411918"
+    },
+    {
+     "name": "3D Drucker, Bambu Lab H2D AMS Combo",
+     "jetzt": "1.749,00 EUR",
+     "vorher": null,
+     "rabatt": null,
+     "bestpreis": "1.749,00 EUR",
+     "verfuegbar": "ja",
+     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246"
+    },
+    {
+     "name": "3D Drucker, Bambu Lab H2D, 10 W Laser",
+     "jetzt": "2.149,00 EUR",
+     "vorher": null,
+     "rabatt": null,
+     "bestpreis": "2.149,00 EUR",
+     "verfuegbar": "ja",
+     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_10_w_laser-401759"
+    },
+    {
+     "name": "3D Drucker, Bambu Lab H2D, 40 W Laser",
+     "jetzt": "2.549,00 EUR",
+     "vorher": null,
+     "rabatt": null,
+     "bestpreis": "2.549,00 EUR",
+     "verfuegbar": "ja",
+     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_40_w_laser-401760"
+    }
+   ]
+  }
+ ]
 }
