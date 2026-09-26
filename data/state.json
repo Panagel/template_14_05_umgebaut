@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 1,
+   "laeufe": 2,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -10,6 +10,13 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385",
      "waehrung": "USD",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 174900,
+       "vorher": 199900,
+       "rabatt": 13,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 174900,
@@ -36,6 +43,13 @@
        "vorher": 254900,
        "rabatt": 16,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 214900,
+       "vorher": 254900,
+       "rabatt": 16,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 214900,
@@ -50,6 +64,13 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709395",
      "waehrung": "USD",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 269900,
+       "vorher": 319900,
+       "rabatt": 16,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 269900,
@@ -76,6 +97,13 @@
        "vorher": 174900,
        "rabatt": 11,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 154900,
+       "vorher": 174900,
+       "rabatt": 11,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 154900,
@@ -90,6 +118,13 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=622679274382356483",
      "waehrung": "USD",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 194900,
+       "vorher": 224900,
+       "rabatt": 13,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 194900,
@@ -116,6 +151,13 @@
        "vorher": 209900,
        "rabatt": 12,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 184900,
+       "vorher": 209900,
+       "rabatt": 12,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 184900,
@@ -129,7 +171,7 @@
    "kampagnen": {}
   },
   "reichelt": {
-   "laeufe": 1,
+   "laeufe": 2,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -137,6 +179,13 @@
      "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245",
      "waehrung": "EUR",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 154900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 154900,
@@ -163,6 +212,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 294900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 294900,
@@ -177,6 +233,13 @@
      "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246",
      "waehrung": "EUR",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 174900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 174900,
@@ -203,6 +266,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 214900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 214900,
@@ -223,6 +293,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 254900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 254900,
@@ -236,5 +313,5 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-09-26T11:03:46.144Z"
+ "letzterLauf": "2026-09-26T11:05:00.549Z"
 }
