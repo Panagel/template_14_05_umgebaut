@@ -8,7 +8,12 @@
 const { get, textOf, produkteAusSeite, produkteAusJsonLd, produkteAusMicrodata, geld, sleep } = require('./lib.js');
 const { istModell, warumNicht, sammleBanner } = require('./shops.js');
 
-// [Gruppe, Beschriftung, URL]
+// [Gruppe, [Beschriftung, URL], ...]
+//
+// Die Liste ist das Protokoll der Haendlersuche vom 26.09.2026: 30 Shops
+// geprueft, zwei brauchbar. Die verworfenen bleiben drin, weil sich das
+// aendern kann - ein Shop, der das Geraet ins Sortiment nimmt oder seine
+// IP-Sperre lockert, faellt dann beim naechsten Lauf hier auf.
 const ZIELE = [
   ['aktiv: Herstellershop',
     ['Startseite (Banner)',   'https://eu.store.bambulab.com/'],
@@ -18,22 +23,34 @@ const ZIELE = [
   ['aktiv: Haendler',
     ['reichelt Suche',        'https://www.reichelt.de/de/de/shop/suche/bambu%20lab%20h2d']],
 
-  ['Kandidaten',
-    ['berrybase',             'https://www.berrybase.de/search?search=bambu+lab+h2d'],
-    ['billiger.de',           'https://www.billiger.de/search?searchString=bambu+lab+h2d']],
-
-  ['geprueft und verworfen',
-    ['3DJake',                'https://www.3djake.de/search?search=bambu+lab+h2d'],
-    ['iGo3D',                 'https://www.igo3d.com/search?search=bambu+lab+h2d'],
+  ['verworfen: sperrt Cloud-IPs',
     ['Geizhals',              'https://geizhals.de/?fs=bambu+lab+h2d&hloc=de&in='],
-    ['Idealo',                'https://www.idealo.de/preisvergleich/MainSearchProductCategory.html?q=bambu+lab+h2d'],
-    ['Alternate',             'https://www.alternate.de/html/product/listing.html?q=bambu+lab+h2d'],
-    ['Galaxus',               'https://www.galaxus.de/de/search?q=bambu+lab+h2d'],
     ['Conrad',                'https://www.conrad.de/de/search.html?search=bambu%20lab%20h2d'],
     ['MediaMarkt',            'https://www.mediamarkt.de/de/search.html?query=bambu%20lab%20h2d'],
     ['Alza',                  'https://www.alza.de/search.htm?exps=bambu+lab+h2d'],
+    ['proshop',               'https://www.proshop.de/Search?search=bambu+lab+h2d'],
+    ['cyberport',             'https://www.cyberport.de/suche/?q=bambu+lab+h2d'],
+    ['antratek',              'https://www.antratek.de/search?q=bambu+lab+h2d'],
+    ['smdv',                  'https://www.smdv.de/search/search.html?keywords=bambu+lab+h2d'],
+    ['Amazon',                'https://www.amazon.de/s?k=bambu+lab+h2d'],
+    ['notebooksbilliger',     'https://www.notebooksbilliger.de/produkte/bambu+lab+h2d']],
+
+  ['verworfen: Preise nur per JavaScript',
+    ['Idealo',                'https://www.idealo.de/preisvergleich/MainSearchProductCategory.html?q=bambu+lab+h2d'],
+    ['Alternate',             'https://www.alternate.de/html/product/listing.html?q=bambu+lab+h2d'],
+    ['Galaxus',               'https://www.galaxus.de/de/search?q=bambu+lab+h2d'],
     ['Coolblue',              'https://www.coolblue.de/suchen?query=bambu+lab+h2d'],
-    ['Amazon',                'https://www.amazon.de/s?k=bambu+lab+h2d']]
+    ['123-3d.nl',             'https://www.123-3d.nl/search?q=bambu+lab+h2d'],
+    ['billiger.de',           'https://www.billiger.de/search?searchString=bambu+lab+h2d']],
+
+  ['verworfen: nur Zubehoer, kein Geraet',
+    ['3DJake',                'https://www.3djake.de/search?search=bambu+lab+h2d'],
+    ['iGo3D',                 'https://www.igo3d.com/search?search=h2d'],
+    ['berrybase',             'https://www.berrybase.de/search?search=bambu+lab+h2d'],
+    ['roboter-bausatz',       'https://www.roboter-bausatz.de/search?search=bambu+lab+h2d'],
+    ['voelkner',              'https://www.voelkner.de/search/search.html?keywords=bambu+lab+h2d'],
+    ['jacob',                 'https://www.jacob.de/search?q=bambu+lab+h2d'],
+    ['eckstein',              'https://eckstein-shop.de/search?search=bambu+lab+h2d']]
 ];
 
 const pad = (s, n) => (String(s) + ' '.repeat(n)).slice(0, n);

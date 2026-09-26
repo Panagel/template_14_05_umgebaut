@@ -12,6 +12,12 @@ module.exports = {
   // hinten.
   modellSlugRe: /^h2d(?:[-_][a-z0-9-]*)?$/i,
 
+  // Locker: das Modell kommt im Kurznamen als eigenes Wort vor, egal an
+  // welcher Stelle. Wird nur zusammen mit gebrauchtRe benutzt, denn
+  // aufgearbeitete Geraete heissen andersherum - "refurbished-h2d-..." -
+  // und sind trotzdem dasselbe Geraet, meist die guenstigste Fassung davon.
+  modellImSlugRe: /(^|[-_])h2d([-_]|$)/i,
+
   // Zubehoer, Ersatzteile und Garantien tragen denselben Modellnamen. Was
   // hier passt, ist kein Drucker.
   //

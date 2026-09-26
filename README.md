@@ -12,18 +12,48 @@ Zustand im Repo, Push per ntfy und Telegram. Nur die Signale sind andere —
 bei einem einzelnen Geraet zaehlt der Preis selbst, nicht die Breite eines
 Sales.
 
-## Vier Signale
+## Fuenf Signale
 
-**1. Preis.** Je Variante wird der aktuelle Preis gegen den **Median der
-letzten 14 Laeufe** gehalten, nicht gegen gestern: ein einzelner Fehlgriff
-beim Lesen soll keinen Alarm ausloesen. Gemeldet wird ab 4 % Abweichung
-(`preisSprungProzent`) und immer bei einem neuen Tiefstand.
+**1. Tiefstpreis ueber alle Shops.** Die Meldung, auf die es ankommt:
+billiger als alles, was der Watcher fuer dieses Geraet je gesehen hat — egal,
+welcher Shop damals der guenstigste war.
 
-Dieselbe Senkung meldet **einmal**. Erst ein noch tieferer Preis meldet
-erneut (`nurTieferMelden`) — sonst pusht ein zwei Wochen laufender Sale jeden
-Morgen aufs Neue. Steigt der Preis wieder, ist die Bremse geloest.
+```
+Tiefstpreis H2D AMS Combo: 1.699,00 EUR bei reichelt
+  - Tiefstpreis fuer H2D AMS Combo: 1.699,00 EUR - billiger als alles bisher
+    Gesehene (1.749,00 EUR bei Bambu Lab Store am 26.09.2026)
+  - Preis 1.749,00 EUR -> 1.699,00 EUR (-3% gegen den Median der letzten Laeufe)
+```
 
-**2. Ausgewiesener Rabatt.** Der Bambu-Shop schreibt seinen Streichpreis in
+Damit das ueber Shopgrenzen funktioniert, muss dasselbe Geraet wiedererkannt
+werden, obwohl jeder Shop es anders nennt: `H2D Laser Full Combo / 10W` beim
+Hersteller, `3D Drucker, Bambu Lab H2D, 10 W Laser` bei reichelt. Beides ist
+die 10-Watt-Laserfassung, beides dieselbe Vergleichsgruppe. Die Zuordnung
+steht in `config.js` unter `varianten`.
+
+Getrennt gehalten wird, was nicht vergleichbar ist: **Pro** zaehlt eigen (ein
+Pro-Geraet darf nicht den Tiefstpreis des einfachen Modells setzen —
+`AMS 2 Pro` im Bundle-Namen ist dabei nicht gemeint), **aufgearbeitete**
+Geraete ebenso, und **jede Waehrung** fuer sich. Diese Meldung geht mit
+ntfy-Prioritaet `urgent` raus und wird von der Meldebremse nie
+zurueckgehalten. Zu laut? In `notify.js` auf `high` stellen.
+
+Beim ersten Lauf nach der Einrichtung meldet dieses Signal nichts: da entsteht
+die Bestmarke erst. Was der Watcher als Bestmarke fuehrt, steht am Ende jedes
+Laufs im Log und in `data/meldungen.json`, und die Testmeldung schickt es mit
+aufs Handy.
+
+**2. Preis je Shop.** Der aktuelle Preis gegen den **Median der letzten 14
+Laeufe**, nicht gegen gestern: ein einzelner Fehlgriff beim Lesen soll keinen
+Alarm ausloesen. Gemeldet wird ab 4 % Abweichung (`preisSprungProzent`) und
+immer, wenn ein Shop seinen eigenen Tiefstand unterbietet — auch wenn ein
+anderer Shop insgesamt guenstiger war.
+
+Dieselbe Senkung meldet **einmal**. Erst ein noch tieferer Preis meldet erneut
+(`nurTieferMelden`) — sonst pusht ein zwei Wochen laufender Sale jeden Morgen
+aufs Neue. Steigt der Preis wieder, ist die Bremse geloest.
+
+**3. Ausgewiesener Rabatt.** Der Bambu-Shop schreibt seinen Streichpreis in
 die Seite (`StrikethroughPrice`). Taucht einer neu auf oder wird er tiefer,
 ist das ein eigenes Signal: dann spricht der Shop selbst von Aktion.
 
@@ -32,14 +62,13 @@ Bambu Lab H2D - H2D / standard             1.549,00 USD statt 1.749,00 USD  -11%
 Bambu Lab H2D - H2D Laser Full Combo / 40W 2.699,00 USD statt 3.199,00 USD  -16%
 ```
 
-Haendler fuehren praktisch nie einen Streichpreis. Dort greift nur Signal 1 —
-was kein Verlust ist, denn die eigene Vorgeschichte ist der ehrlichere
-Vergleich.
+Haendler fuehren praktisch nie einen Streichpreis. Dort greifen Signal 1
+und 2 — was kein Verlust ist, denn die eigene Vorgeschichte ist der
+ehrlichere Vergleich.
 
-**3. Beworbene Kampagne.** Aktionen stehen als Fliesstext im Seitenkopf, oft
+**4. Beworbene Kampagne.** Aktionen stehen als Fliesstext im Seitenkopf, oft
 samt Gutscheincode. Gemeldet wird eine Aktion einmal; erst wenn sie laenger
-als 30 Tage verschwunden war, gilt sie wieder als neu
-(`kampagneStillTage`).
+als 30 Tage verschwunden war, gilt sie wieder als neu (`kampagneStillTage`).
 
 Dauerwerbung fliegt raus. Der Bambu-Shop bewirbt im Kopf staendig
 Verbrauchsmaterial — `Price Drop Alert! Mix 2+ rolls for bulk discounts`,
@@ -47,13 +76,14 @@ Verbrauchsmaterial — `Price Drop Alert! Mix 2+ rolls for bulk discounts`,
 keine dieser Zeilen hat mit dem Druckerpreis zu tun. Werbung, die
 Verbrauchsmaterial oder Zubehoerpakete nennt und kein Geraet, wird verworfen.
 `price drop` steht deshalb auch nicht in der Aktionsliste: eine Preissenkung
-erkennt Signal 1 an den Zahlen, und zwar genauer.
+erkennen Signal 1 und 2 an den Zahlen, und zwar genauer.
 
-**4. Lieferbarkeit und neue Varianten.** Aus *nicht lieferbar* wird
+**5. Lieferbarkeit und neue Varianten.** Aus *nicht lieferbar* wird
 *lieferbar* — eigene Nachricht. Taucht eine Variante neu auf (etwa ein
 spaeteres Pro-Modell), ebenfalls, aber nur wenn der Shop vorher schon Daten
 geliefert hat: beim ersten Lauf ist alles neu, und niemand will elf
-Nachrichten auf einmal.
+Nachrichten auf einmal. Unterbietet die neue Variante gleich den Tiefstpreis
+ihrer Gruppe, wird daraus Signal 1 — eine Nachricht, nicht zwei.
 
 ## Einrichtung
 
@@ -152,6 +182,11 @@ von allein auf.
 `h2d-pro` liefert derzeit keine Variante: die Seite antwortet, traegt aber
 keinen Preisblock. Den Pro-Preis kennt der Watcher trotzdem — ueber reichelt.
 
+Mitgesucht werden auch **aufgearbeitete Geraete**. Die heissen im Shop
+andersherum (`refurbished-h2d-…`), sind aber dasselbe Geraet und meist die
+guenstigste Fassung davon. Sie laufen als eigene Vergleichsgruppe, damit ein
+aufgearbeitetes Geraet nie den Tiefstpreis der Neuware setzt.
+
 ### Warum der Herstellershop US-Preise liefert
 
 `eu.store.bambulab.com` antwortet einem GitHub-Runner nicht. Cloudflare
@@ -187,25 +222,59 @@ statt einen Waehrungswechsel als Preissturz von 15 % zu melden.
 
 ### Ebenfalls geprueft und verworfen
 
+30 Shops durchgesehen, gemessen am 26.09.2026 von einem Runner aus. Drei
+Gruende, warum ein Shop nicht dabei ist:
+
+**Sperrt Cloud-IPs.** Dieselbe Sorte Hindernis wie Louis im
+Motorrad-Watcher: IP-Reputation, kein Header- oder Parserproblem.
+
 ```
-Geizhals            HTTP 403     sperrt die Runner-IPs
-Conrad              HTTP 403     sperrt die Runner-IPs
-MediaMarkt          HTTP 403     sperrt die Runner-IPs
-Alza                HTTP 403     sperrt die Runner-IPs
-Amazon              HTTP 200     2 242 B, 0 Zeichen sichtbarer Text - Blockseite
-Idealo              HTTP 200     2 606 B, 32 Zeichen - JavaScript-Wall
-Alternate           HTTP 200     "JavaScript ist nicht aktiviert", keine Preise im HTML
-Galaxus             HTTP 200     Preise erst per GraphQL, nichts im HTML
-Coolblue            HTTP 200     nennt das Geraet, Preise erst per JavaScript
-billiger.de         HTTP 200     leitet die Suche auf die Startseite um
-3DJake              HTTP 200     fuehrt das Geraet nicht, nur Zubehoer
-iGo3D               HTTP 200     fuehrt das Geraet nicht, nur Zubehoer
-berrybase           HTTP 200     nennt das Geraet, aber kein Preis im Markup
+Geizhals            HTTP 403
+Conrad              HTTP 403
+MediaMarkt          HTTP 403
+Alza                HTTP 403
+proshop             HTTP 403
+cyberport           HTTP 403
+antratek            HTTP 403
+smdv                HTTP 403 (antwortete anfangs, sperrte dann)
+Amazon              HTTP 200, 2 242 B, 0 Zeichen sichtbarer Text - Blockseite
+notebooksbilliger   HTTP 200, 2 637 B, 32 Zeichen - Blockseite
 ```
 
-Die vier 403er sind derselbe Fall wie Louis im Motorrad-Watcher:
-IP-Reputation. Gibt ein Shop die Ranges irgendwann frei, genuegt ein Eintrag
-in `shops.js` und ein Schalter in `config.js`.
+**Preise erst per JavaScript.** Die Seite kommt an, die Zahlen stehen aber
+nicht drin. Ohne Headless-Browser nicht lesbar — und der waere in einem
+zweimal taeglichen Lauf ein Klotz am Bein.
+
+```
+Idealo              HTTP 200,  2 606 B,    32 Zeichen - JavaScript-Wall
+Alternate           HTTP 200, 65 310 B, 5 127 Zeichen, "JavaScript ist nicht aktiviert"
+Galaxus             HTTP 200, 72 670 B, 2 058 Zeichen, Preise via GraphQL
+Coolblue            HTTP 200               nennt das Geraet, keine Preise im HTML
+123-3d.nl           HTTP 200, 83 693 B, 3 043 Zeichen
+billiger.de         leitet die Suche auf die Startseite um
+```
+
+**Fuehrt das Geraet nicht.** Der haeufigste Fall, und der ueberraschendste:
+mehrere 3D-Druck-Haendler verkaufen reichlich Zubehoer **fuer** den H2D, aber
+nicht den Drucker.
+
+```
+roboter-bausatz     8 Treffer, alle Druckplatten fuer den H2D (ab 26,15 EUR)
+iGo3D               1 Treffer, ein PTFE-Schlauch fuer den H2D (3,99 EUR)
+3DJake              kein H2D, auch nicht auf der Bambu-Lab-Markenseite
+berrybase           nennt den H2D im Text, kein Produkt, kein Link
+voelkner            nennt den H2D, kein Produkt
+jacob, eckstein     fuehren das Geraet nicht
+```
+
+Nicht erreichbar oder Adresse unbekannt: 3dmensionals, kiwi-electronics,
+123-3d.de, filamentworld, 3ddruckboutique, technikstore24 (DNS-Fehler oder
+404 auf allen probierten Suchadressen).
+
+Die Liste steht in [`diag.js`](diag.js) und laeuft als Workflow
+**Shop-Diagnose** jederzeit wieder durch. Nimmt einer dieser Shops das Geraet
+ins Sortiment oder lockert seine Sperre, faellt es dort auf: dann genuegt ein
+Eintrag in `shops.js` und ein Schalter in `config.js`.
 
 ### Eigenheiten
 
@@ -233,13 +302,14 @@ Alles in [`config.js`](config.js).
 | Zuviel Meldungen? | Zuwenig? |
 |---|---|
 | `preisSprungProzent` hoch | runter |
+| `tiefstpreisMelden` auf `false` | auf `true` lassen |
 | `bestpreisMelden` auf `false` | auf `true` lassen |
 | `rabattMinProzent` hoch | runter |
 | `kampagneMinProzent` hoch | runter |
 | `verfuegbarkeitMelden` auf `false` | auf `true` lassen |
 
-Ein anderes Geraet beobachten? `modellRe`, `modellSlugRe` und die
-Preisspanne umstellen — der Rest ist geraeteunabhaengig.
+Ein anderes Geraet beobachten? `modellRe`, `modellSlugRe`, `varianten`,
+`proRe` und die Preisspanne umstellen — der Rest ist geraeteunabhaengig.
 
 ## Dateien
 
@@ -252,12 +322,13 @@ Preisspanne umstellen — der Rest ist geraeteunabhaengig.
 | `testpush.js` | Testmeldung, ohne auf eine echte Senkung zu warten |
 | `config.js` | Schwellen, Modellfilter und Shop-Schalter |
 | `diag.js` | prueft, welche Shops dieses Netz durchlaesst |
-| `data/state.json` | Vorgeschichte je Variante: Verlauf, Tiefstand, Kampagnen |
+| `data/state.json` | Vorgeschichte je Variante, Tiefstpreise je Gruppe, Kampagnen |
 | `data/meldungen.json` | Ergebnis des letzten Laufs |
 
 `data/state.json` ist die Grundlage — **nicht loeschen**, sonst faengt die
-Bewertung bei null an: jede Variante gilt wieder als Erstsichtung, und
-Tiefstaende von vorher sind vergessen.
+Bewertung bei null an: jede Variante gilt wieder als Erstsichtung, und alle
+Tiefstpreise sind vergessen. Der Watcher schweigt dann, bis die Preise
+erneut unter die neu aufgebaute Bestmarke fallen.
 
 ## Grenzen
 

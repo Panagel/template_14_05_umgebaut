@@ -87,7 +87,10 @@ async function bambu(cfg, log) {
     let m, gefunden = 0;
     while ((m = re.exec(sm.body))) {
       const slug = (m[1].match(/\/products\/([^/?#]+)\/?$/) || [])[1];
-      if (!slug || !CFG.modellSlugRe.test(slug)) continue;
+      if (!slug) continue;
+      const passt = CFG.modellSlugRe.test(slug) ||
+        (CFG.gebrauchtRe.test(slug) && CFG.modellImSlugRe.test(slug));
+      if (!passt) continue;
       if (CFG.ausschlussRe.test(slug.replace(/[-_]/g, ' '))) continue;
       nimmSeite(m[1]);
       gefunden++;
