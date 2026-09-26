@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { median, geld } = require('./lib.js');
-const { SHOPS } = require('./shops.js');
+const { SHOPS, variantenKlasse, klassenName } = require('./shops.js');
 const CFG = require('./config.js');
 
 const DATA = path.join(__dirname, 'data');
@@ -68,6 +68,12 @@ const rabattVon = p => (p.vorher && p.jetzt && p.vorher > p.jetzt)
 async function main() {
   fs.mkdirSync(DATA, { recursive: true });
   const state = ladeState();
+  // Tiefstpreise je Ausbaustufe und Waehrung, ueber alle Shops hinweg.
+  if (!state.tiefstpreise) state.tiefstpreise = {};
+  // Nur wo vor diesem Lauf schon ein Tiefstpreis stand, ist ein tieferer
+  // Preis ein Ereignis. Beim ersten Sehen ist er bloss der Anfang der
+  // Aufzeichnung - sonst waere der erste Lauf eine Meldungslawine.
+  const tiefBekannt = new Set(Object.keys(state.tiefstpreise));
   const meldungen = [];
   const uebersicht = [];
   let shopsMitDaten = 0;
@@ -135,6 +141,26 @@ async function main() {
       const gruende = [];
       let typ = null;
 
+      // --- Tiefstpreis ueber alle Shops --------------------------------
+      // Verglichen wird ueber Shopgrenzen hinweg, aber nur innerhalb einer
+      // Waehrung und derselben Ausbaustufe: der Preis eines Laser-Combo
+      // sagt nichts ueber das nackte Geraet.
+      const klasse = variantenKlasse(p.name);
+      const tKey = klasse + '|' + (p.waehrung || '?');
+      const tief = state.tiefstpreise[tKey];
+      let tiefstand = null;
+      if (CFG.tiefstpreisMelden && tief && tiefBekannt.has(tKey) && p.jetzt < tief.preis) {
+        tiefstand = 'Tiefstpreis fuer ' + klassenName(klasse) + ': ' + g(p.jetzt) +
+                    ' - billiger als alles bisher Gesehene (' + geld(tief.preis, tief.waehrung) +
+                    ' bei ' + tief.shop + ' am ' + tief.datum + ')';
+      }
+      if (!tief || p.jetzt < tief.preis) {
+        state.tiefstpreise[tKey] = {
+          klasse: klasse, preis: p.jetzt, waehrung: p.waehrung || '?',
+          shop: cfg.name, name: p.name, url: p.url, datum: heute
+        };
+      }
+
       if (!alt) {
         // Erstsichtung: Grundlage anlegen, nicht bewerten. Nur wenn der Shop
         // vorher schon geliefert hat, ist eine neue Variante eine Nachricht.
@@ -147,10 +173,23 @@ async function main() {
         };
         const altWaehrung = bekannteWaehrung.get(p.id);
         const nurWaehrung = altWaehrung && altWaehrung !== (p.waehrung || '?');
-        log('   + ' + p.name + '  ' + g(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
-            (nurWaehrung ? '  Waehrungswechsel ' + altWaehrung + ' -> ' + (p.waehrung || '?') + ', Grundlage faengt neu an'
-                         : (st.laeufe > 0 ? '  NEU' : '  erfasst')));
-        if (st.laeufe > 0 && CFG.neueVariantenMelden && !nurWaehrung) {
+        if (!tiefstand) {
+          log('   + ' + p.name + '  ' + g(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
+              (nurWaehrung ? '  Waehrungswechsel ' + altWaehrung + ' -> ' + (p.waehrung || '?') + ', Grundlage faengt neu an'
+                           : (st.laeufe > 0 ? '  NEU' : '  erfasst')));
+        }
+        if (tiefstand) {
+          // Eine neue Variante, die alles unterbietet: das ist keine
+          // Katalognachricht, das ist der Tiefstpreis.
+          meldungen.push({
+            typ: 'tiefstand', shop: cfg.name, url: p.url || cfg.basis,
+            titel: 'Tiefstpreis ' + klassenName(klasse) + ': ' + g(p.jetzt) + ' bei ' + cfg.name,
+            gruende: [tiefstand, 'Die Variante ist im Shop neu: ' + p.name]
+              .concat(cfg.hinweis ? [cfg.hinweis] : []),
+            produkte: [zeile(p, rab, p.jetzt)]
+          });
+          log('   ! ' + p.name + '  ' + g(p.jetzt) + '  NEU und ' + tiefstand);
+        } else if (st.laeufe > 0 && CFG.neueVariantenMelden && !nurWaehrung) {
           meldungen.push({
             typ: 'neu', shop: cfg.name, url: p.url || cfg.basis,
             titel: cfg.name + ': ' + p.name + ' neu im Shop',
@@ -166,9 +205,11 @@ async function main() {
       const istBestpreis = typeof alt.bestpreis === 'number' && p.jetzt < alt.bestpreis;
       const istRutsch = bGrund && p.jetzt <= Math.round(bGrund * (1 - CFG.preisSprungProzent / 100));
 
-      if (istBestpreis && CFG.bestpreisMelden) {
-        gruende.push('Neuer Tiefstand: ' + g(p.jetzt) + ' (bisher ' + g(alt.bestpreis) +
-                     ' am ' + (alt.bestpreisDatum || '?') + ')');
+      // Den shop-eigenen Tiefstand nicht doppelt sagen: hielt derselbe Shop
+      // schon die Bestmarke, steht es in der Tiefstpreiszeile.
+      if (istBestpreis && CFG.bestpreisMelden && !(tiefstand && tief && tief.shop === cfg.name)) {
+        gruende.push('Tiefster Preis, den dieser Shop bisher hatte: ' + g(p.jetzt) +
+                     ' (vorher ' + g(alt.bestpreis) + ' am ' + (alt.bestpreisDatum || '?') + ')');
       }
       if (istRutsch) {
         gruende.push('Preis ' + g(bGrund) + ' -> ' + g(p.jetzt) +
@@ -180,6 +221,11 @@ async function main() {
         gruende.push('Shop weist -' + rab + '% aus: ' + g(p.vorher) + ' -> ' + g(p.jetzt));
       }
       if (gruende.length) typ = 'preis';
+      // Der Tiefstpreis ueber alle Shops ist die wichtigste Nachricht: er
+      // steht als erster Grund und hebt den Meldetyp. Damit geht er mit
+      // hoechster Prioritaet raus - und die Meldebremse unten greift nicht,
+      // weil die nur Meldungen vom Typ "preis" zurueckhaelt.
+      if (tiefstand) { gruende.unshift(tiefstand); typ = 'tiefstand'; }
 
       // Meldebremse: dieselbe Senkung nicht jeden Lauf wiederholen. Erst ein
       // noch tieferer Preis meldet erneut.
@@ -201,12 +247,14 @@ async function main() {
         if (cfg.hinweis) gruende.push(cfg.hinweis);
         meldungen.push({
           typ: typ, shop: cfg.name, url: p.url || cfg.basis,
-          titel: cfg.name + ': ' + p.name + (typ === 'preis' ? ' fuer ' + g(p.jetzt) : ' wieder lieferbar'),
+          titel: typ === 'tiefstand'
+            ? 'Tiefstpreis ' + klassenName(klasse) + ': ' + g(p.jetzt) + ' bei ' + cfg.name
+            : cfg.name + ': ' + p.name + (typ === 'preis' ? ' fuer ' + g(p.jetzt) : ' wieder lieferbar'),
           gruende: gruende,
           produkte: [zeile(p, rab, Math.min(p.jetzt, alt.bestpreis || p.jetzt))]
         });
         log('   ! ' + p.name + '  ' + g(p.jetzt) + '  ' + gruende.join(' | '));
-        if (typ === 'preis') alt.gemeldeterPreis = p.jetzt;
+        if (typ === 'preis' || typ === 'tiefstand') alt.gemeldeterPreis = p.jetzt;
       } else if (!gebremst) {
         log('   . ' + p.name + '  ' + g(p.jetzt) + (rab ? '  (-' + rab + '%)' : '') +
             '  [Tief ' + g(alt.bestpreis) + ']');
@@ -261,8 +309,20 @@ async function main() {
 
   state.letzterLauf = new Date().toISOString();
   fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
-  fs.writeFileSync(MELD, JSON.stringify({ datum: heute, meldungen: meldungen, uebersicht: uebersicht }, null, 1));
+  // Tiefstpreise mitschreiben: so zeigt die Testmeldung, was der Watcher
+  // als Bestmarke fuehrt, ohne dass man state.json lesen muss.
+  const tiefstListe = Object.keys(state.tiefstpreise).sort().map(k => {
+    const t = state.tiefstpreise[k];
+    return { klasse: klassenName(t.klasse || k.split('|')[0]), preis: geld(t.preis, t.waehrung),
+             shop: t.shop, datum: t.datum, url: t.url };
+  });
+  fs.writeFileSync(MELD, JSON.stringify({
+    datum: heute, meldungen: meldungen, uebersicht: uebersicht, tiefstpreise: tiefstListe
+  }, null, 1));
 
+  log('');
+  log('Tiefstpreise bisher:');
+  for (const t of tiefstListe) log('   ' + t.klasse.padEnd(34) + t.preis.padStart(14) + '  ' + t.shop + '  (' + t.datum + ')');
   log('');
   log('Meldungen: ' + meldungen.length + ' | Shops mit Daten: ' + shopsMitDaten);
 

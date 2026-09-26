@@ -20,6 +20,10 @@ for (const u of (d.uebersicht || [])) {
   }
 }
 
+// Die Bestmarken mitschicken - daran sieht man am Handy sofort, ob der
+// Watcher eine Vorgeschichte hat, gegen die er vergleichen kann.
+const tief = (d.tiefstpreise || []).map(t => '  ' + t.klasse + ': ' + t.preis + ' (' + t.shop + ', ' + t.datum + ')');
+
 d.meldungen = [{
   typ: 'neu',
   shop: 'Test',
@@ -27,7 +31,8 @@ d.meldungen = [{
   titel: 'H2D-Watcher: Testmeldung',
   gruende: ['Wenn du das liest, funktioniert der Push.',
             zeilen.length ? 'Der letzte Scan hat ' + zeilen.length + ' Variante(n) gesehen.'
-                          : 'Achtung: der letzte Scan hat keine Preise geliefert.'],
+                          : 'Achtung: der letzte Scan hat keine Preise geliefert.']
+           .concat(tief.length ? ['Tiefstpreise bisher:'].concat(tief) : []),
   produkte: zeilen.slice(0, 12)
 }];
 

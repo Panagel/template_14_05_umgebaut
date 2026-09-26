@@ -30,6 +30,28 @@ function istModell(p) {
   return p.jetzt >= CFG.preisMin && p.jetzt <= CFG.preisMax;
 }
 
+// Welche Ausbaustufe ist das? Zwei Shops nennen dasselbe Geraet anders,
+// der Tiefstpreis ueber alle Shops braucht aber einen gemeinsamen Namen.
+// "Pro" und Gebrauchtware stehen davor, damit sie nie mit Neuware des
+// einfachen Modells verglichen werden.
+function variantenKlasse(name) {
+  const n = String(name || '');
+  const vor = (CFG.gebrauchtRe.test(n) ? 'gebraucht+' : '') + (CFG.proRe.test(n) ? 'pro+' : '');
+  for (const [kennung, re] of CFG.varianten) if (re.test(n)) return vor + kennung;
+  return vor + 'basis';
+}
+
+// Lesbarer Name einer Klasse, fuer die Meldung.
+function klassenName(klasse) {
+  const teile = klasse.split('+');
+  const kern = teile[teile.length - 1];
+  const eintrag = CFG.varianten.find(v => v[0] === kern);
+  let name = eintrag ? eintrag[2] : 'H2D';
+  if (teile.includes('pro')) name = name.replace(/^H2D/, 'H2D Pro');
+  if (teile.includes('gebraucht')) name = name + ' (aufgearbeitet)';
+  return name;
+}
+
 // Warum ein Treffer durchgefallen ist - nur fuer die Diagnose.
 function warumNicht(p) {
   const name = String(p.name || '');
@@ -303,4 +325,4 @@ const SHOPS = {
   }
 };
 
-module.exports = { SHOPS, istModell, warumNicht, sammleBanner, AKTION_RE, bambu, haendler };
+module.exports = { SHOPS, istModell, warumNicht, variantenKlasse, klassenName, sammleBanner, AKTION_RE, bambu, haendler };

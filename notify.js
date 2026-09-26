@@ -8,6 +8,10 @@ const path = require('path');
 const MELD = path.join(__dirname, 'data', 'meldungen.json');
 
 const KOPF = {
+  // Der Tiefstpreis ueber alle Shops ist die einzige Meldung mit "urgent":
+  // sie soll auch durch eine stille Stunde kommen. Zu laut? In notify.js
+  // auf 'high' setzen.
+  tiefstand:  { prio: 'urgent',  tags: 'rotating_light,money_with_wings' },
   kampagne:   { prio: 'high',    tags: 'fire,shopping' },
   preis:      { prio: 'high',    tags: 'chart_with_downwards_trend,money_with_wings' },
   verfuegbar: { prio: 'default', tags: 'package' },

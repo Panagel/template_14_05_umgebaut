@@ -33,6 +33,34 @@ module.exports = {
     '|\\b(?:garantie|versicherung|wartung|schutz|versand|zubeh[oö]r)[a-zäöüß]*\\b'
   ].join(''), 'i'),
 
+  // --- Varianten wiedererkennen ------------------------------------------
+  // Fuer den Tiefstpreis ueber alle Shops muss dasselbe Geraet
+  // wiedererkannt werden, obwohl jeder Shop es anders nennt: der
+  // Herstellershop schreibt "H2D Laser Full Combo / 10W", reichelt
+  // "3D Drucker, Bambu Lab H2D, 10 W Laser". Dasselbe Geraet, derselbe
+  // Preisvergleich.
+  //
+  // Der erste passende Eintrag gewinnt, das Genauere steht deshalb oben.
+  // Der letzte Eintrag faengt alles uebrige: das nackte Geraet.
+  varianten: [
+    ['laser40',    /\b40\s*w\b/i,                   'H2D Laser 40 W'],
+    ['laser10',    /\b10\s*w\b/i,                   'H2D Laser 10 W'],
+    ['laser',      /laser/i,                        'H2D Laser'],
+    ['combo-dual', /\bdual\s*ams\b/i,               'H2D AMS Combo (Dual AMS 2 Pro)'],
+    ['combo-ht',   /\bams\s*ht\b|\bht\s*bundle\b/i, 'H2D AMS Combo (AMS HT)'],
+    ['combo',      /\bams\b|\bcombo\b/i,            'H2D AMS Combo'],
+    ['basis',      /./,                             'H2D']
+  ],
+
+  // "Pro" zaehlt getrennt, sonst wuerde ein Pro-Geraet den Tiefstpreis des
+  // einfachen Modells setzen. Wortnah gepruefte Stelle: "AMS 2 Pro" im
+  // Bundle-Namen ist nicht das Pro-Modell.
+  proRe: /h2d\s*pro\b/i,
+
+  // Gebrauchtes und Neuware nie in einen Topf: der Herstellershop fuehrt
+  // aufgearbeitete Geraete mit im Sortiment.
+  gebrauchtRe: /\brefurb|\bb-?ware\b|\bgebraucht\b|\bopen\s*box\b/i,
+
   // Plausible Preisspanne eines Geraets in Cent. Das ist der wirksamere der
   // beiden Filter: Duesen kosten zweistellig, Drucker vierstellig.
   //
@@ -52,7 +80,14 @@ module.exports = {
   // ein einzelner Fehlgriff beim Parsen soll keinen Alarm ausloesen.
   baselineLaeufe: 14,
   preisSprungProzent: 4,       // ab -4 % gegen den Median wird gemeldet
-  bestpreisMelden: true,       // neuer Tiefstand meldet immer, auch unter 4 %
+  bestpreisMelden: true,       // Tiefstand in diesem Shop meldet immer
+
+  // Der Tiefstpreis ueber alle Shops. Das ist die Meldung, auf die es
+  // ankommt: billiger als alles, was der Watcher fuer dieses Geraet je
+  // gesehen hat - unabhaengig davon, welcher Shop es damals war. Sie geht
+  // mit hoechster Prioritaet raus und wird von der Meldebremse nie
+  // zurueckgehalten.
+  tiefstpreisMelden: true,
 
   // Dieselbe Preissenkung nur einmal melden. Erst wenn der Preis noch
   // tiefer faellt, kommt die naechste Nachricht - sonst pusht ein zwei
