@@ -24,8 +24,8 @@ module.exports = {
   ausschlussRe: new RegExp([
     '\\b(?:nozzle|hotend|heatbed|bed\\s*plate|build\\s*plate|sheet|filament|spool|belt|fan',
     '|camera|goggles|cover|door|screw|adapter|holder|mount|bag|sticker|mat|cleaner|maintenance',
-    '|spare|kit|set|set\\s*of|accessor|warranty|protection\\s*plan|shipping|gift\\s*card|tube',
-    '|unit|board|sensor|module|upgrade|refill|ptfe|toolbox|tool\\s*box|hardware|zubeh[oö]r|ersatz',
+    '|spare|kit|set|accessor|warranty|protection\\s*plan|shipping|gift\\s*card|tube',
+    '|unit|board|sensor|module|upgrade|refill|ptfe|toolbox|tool\\s*box|hardware|ersatz',
     '|deckel|t[uü]r|schraube|spule|aufkleber|nachr[uü]st)\\b',
     '|[a-zäöüß]*(?:d[uü]se|modul|platte|platine|kabel|matte|riemen|filter|halter|tasche|schlauch',
     '|reiniger|bl[oö]cker|geh[aä]use|glas|brille|beutel|lager|einheit)n?\\b',
@@ -33,6 +33,8 @@ module.exports = {
     '|\\b(?:garantie|versicherung|wartung|schutz|versand|zubeh[oö]r)[a-zäöüß]*\\b'
   ].join(''), 'i'),
 
+  // Plausible Preisspanne eines Geraets in Cent. Das ist der wirksamere der
+  // beiden Filter: Duesen kosten zweistellig, Drucker vierstellig.
   //
   // Gemessen am 26.09.2026: das billigste Geraet stand bei 1.549, das
   // teuerste (H2D Pro) bei 2.949. Die Spanne ist mit Absicht weit, damit
@@ -58,8 +60,9 @@ module.exports = {
   nurTieferMelden: true,
 
   // --- Signal 2: ausgewiesener Rabatt ------------------------------------
-  // Streichpreis im Shop. Der Bambu-Shop fuehrt ihn als compare_at_price,
-  // Haendler oft gar nicht - dort greift nur Signal 1.
+  // Streichpreis im Shop. Der Bambu-Shop schreibt ihn als
+  // StrikethroughPrice in seinen JSON-LD-Block, Haendler fuehren ihn
+  // praktisch nie - dort greift nur Signal 1.
   rabattMinProzent: 5,
 
   // --- Signal 3: beworbene Kampagne --------------------------------------
@@ -75,7 +78,7 @@ module.exports = {
   verfuegbarkeitMelden: true,
 
   // Eine neu aufgetauchte Variante melden (etwa ein Pro-Modell). Nur, wenn
-  // der Shop vorher schon Daten geliefert hat - beim ersten Lauf ist alles
-  // neu und niemand will vier Nachrichten auf einmal.
+  // der Shop vorher schon Daten geliefert hat - beim ersten Lauf sind alle
+  // elf Varianten neu, und niemand will elf Nachrichten auf einmal.
   neueVariantenMelden: true
 };
