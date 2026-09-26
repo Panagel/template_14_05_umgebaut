@@ -281,6 +281,29 @@ function produkteAusMicrodata(html, basis) {
   return out;
 }
 
+// Kennungen muessen innerhalb einer Seite eindeutig sein, sonst schreiben
+// mehrere Varianten in denselben Datensatz und vier von fuenf gehen
+// verloren. Das ist kein theoretischer Fall: reichelt setzt in jedes
+// Produkt der Trefferliste dieselbe Artikelnummer - die Marke, "BAMBU LAB".
+// Wo eine Nummer mehrfach vorkommt, ist sie als Schluessel unbrauchbar;
+// dann zaehlen Adresse und Name.
+function eindeutigeKennungen(liste) {
+  const wieOft = new Map();
+  for (const p of liste) wieOft.set(p.id, (wieOft.get(p.id) || 0) + 1);
+  const vergeben = new Set();
+  for (const p of liste) {
+    if (wieOft.get(p.id) > 1) {
+      p.id = (p.url || p.id) + '#' + String(p.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 40);
+    }
+    // Auch das noch doppelt? Durchzaehlen, damit kein Datensatz verschwindet.
+    let k = p.id, n = 2;
+    while (vergeben.has(k)) k = p.id + '~' + (n++);
+    p.id = k.slice(0, 160);
+    vergeben.add(p.id);
+  }
+  return liste;
+}
+
 // Beide Wege zusammen, doppelte Treffer heraus. Ein Shop kann dieselbe Ware
 // als JSON-LD und als Microdata auszeichnen; JSON-LD gewinnt, weil dort auch
 // der Streichpreis steht.
@@ -293,7 +316,7 @@ function produkteAusSeite(html, basis) {
     if (bekanntName.has(p.name.toLowerCase() + '|' + p.jetzt)) continue;
     out.push(p);
   }
-  return out;
+  return eindeutigeKennungen(out);
 }
 
 // Links einer Seite, deren Adresse auf das gesuchte Modell passt. Dient als
@@ -319,5 +342,5 @@ function linksMitModell(html, basis, modellRe) {
 module.exports = {
   get, getJson, textOf, unent, cents, eur, geld, median, pct, sleep, UA,
   jsonLdBloecke, flachJsonLd, istTyp, ausOffers, produkteAusJsonLd,
-  produkteAusMicrodata, produkteAusSeite, linksMitModell
+  produkteAusMicrodata, produkteAusSeite, eindeutigeKennungen, linksMitModell
 };

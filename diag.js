@@ -69,6 +69,9 @@ const pad = (s, n) => (String(s) + ' '.repeat(n)).slice(0, n);
         for (const p of passend.slice(0, 8)) {
           notiz.push('  + ' + pad(p.name, 46) + ' ' + geld(p.jetzt, p.waehrung) +
                      (p.vorher ? ' statt ' + geld(p.vorher, p.waehrung) : '') + ' [' + (p.verfuegbar || '?') + ']');
+          // Die Kennung mitzeigen: sie ist der Schluessel im Zustand, und ein
+          // Shop, der ueberall dieselbe hinschreibt, faellt nur hier auf.
+          notiz.push('      Kennung ' + p.id.slice(0, 92));
         }
         for (const p of alle.filter(x => !istModell(x)).slice(0, 3)) {
           notiz.push('  - ' + pad(p.name, 46) + ' ' + geld(p.jetzt, p.waehrung) + '  (' + warumNicht(p) + ')');
