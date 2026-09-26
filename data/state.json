@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 5,
+   "laeufe": 6,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -10,6 +10,13 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385",
      "waehrung": "USD",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 174900,
+       "vorher": 199900,
+       "rabatt": 13,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 174900,
@@ -174,6 +181,13 @@
        "vorher": 174900,
        "rabatt": 11,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 154900,
+       "vorher": 174900,
+       "rabatt": 11,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 154900,
@@ -283,6 +297,13 @@
        "vorher": 174900,
        "rabatt": 16,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-09-26",
+       "jetzt": 146900,
+       "vorher": 174900,
+       "rabatt": 16,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 146900,
@@ -296,7 +317,7 @@
    "kampagnen": {}
   },
   "reichelt": {
-   "laeufe": 5,
+   "laeufe": 6,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -304,6 +325,13 @@
      "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245",
      "waehrung": "EUR",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 154900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 154900,
@@ -393,6 +421,13 @@
      "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246",
      "waehrung": "EUR",
      "verlauf": [
+      {
+       "datum": "2026-09-26",
+       "jetzt": 174900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
       {
        "datum": "2026-09-26",
        "jetzt": 174900,
@@ -522,7 +557,7 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-09-26T15:14:33.123Z",
+ "letzterLauf": "2026-09-26T20:06:23.893Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
