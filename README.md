@@ -12,6 +12,13 @@ Zustand im Repo, Push per ntfy und Telegram. Nur die Signale sind andere —
 bei einem einzelnen Geraet zaehlt der Preis selbst, nicht die Breite eines
 Sales.
 
+> **Zweite Wache in diesem Repo:** die
+> [Feuertanz-Ticketwache](README-feuertanz-tickets.md) meldet, sobald es
+> Karten fuer das Feuertanz Festival auf Burg Abenberg gibt. Eigene Dateien
+> (`ticket-*.js`, `data-feuertanz/`), eigener Workflow, gemeinsam genutzt
+> werden `notify.js` und `lib.js`. Beide Wachen laufen nebeneinander — der
+> Zeitplan gilt allerdings nur fuer den Standardbranch, siehe dort.
+
 ## Was beobachtet wird
 
 Der H2D wird in mehreren Ausbaustufen verkauft. Beobachtet werden die beiden,
