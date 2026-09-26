@@ -1,0 +1,16 @@
+name: Tiefendiagnose
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diag2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Datenquellen suchen
+        run: node diag2.js
