@@ -1,0 +1,81 @@
+name: H2D-Preisscan
+
+on:
+  schedule:
+    # zweimal taeglich, 05:35 und 17:35 UTC. Preissenkungen schaltet der
+    # Bambu-Shop meist zum Tagesbeginn; der Abendlauf faengt kurze
+    # Flash-Aktionen, die bis zum naechsten Morgen schon vorbei waeren.
+    - cron: '35 5 * * *'
+    - cron: '35 17 * * *'
+  workflow_dispatch:
+    inputs:
+      testpush:
+        description: 'Testmeldung senden, auch ohne Preisaenderung'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: h2d-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Shops abfragen
+        run: node scan.js
+
+      - name: Testmeldung erzeugen
+        if: github.event.inputs.testpush == 'true'
+        run: node testpush.js
+
+      - name: Zustand sichern
+        run: |
+          git config user.name "h2d-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A data
+          if git diff --staged --quiet; then
+            echo "Keine Aenderungen."
+          else
+            git commit -m "Scan $(date -u +%F\ %H:%M)"
+            git pull --rebase --autostash
+            git push
+          fi
+
+      - name: Push senden
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node notify.js
+
+      - name: Warnung bei Fehlschlag
+        if: failure()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LAUF: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TEXT="H2D-Preisscan fehlgeschlagen. Vermutlich hat ein Shop seine Seitenstruktur geaendert oder blockt die Runner. Lauf: $LAUF"
+          if [ -n "$TELEGRAM_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            curl -sS -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+              --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+              --data-urlencode "text=$TEXT" \
+              -o /dev/null || true
+          fi
+          if [ -n "$NTFY_TOPIC" ]; then
+            curl -sS -H "Title: H2D-Preisscan fehlgeschlagen" -H "Priority: high" -H "Tags: warning" \
+              -d "$TEXT" "https://ntfy.sh/$NTFY_TOPIC" || true
+          fi

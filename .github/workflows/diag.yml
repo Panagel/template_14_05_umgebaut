@@ -1,0 +1,18 @@
+name: Shop-Diagnose
+
+# Prueft von einem Runner aus, welche Shops antworten und welche sich lesen
+# lassen. Nur von Hand startbar - laeuft in keinem Zeitplan mit.
+on:
+  workflow_dispatch:
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Shops pruefen
+        run: node diag.js
