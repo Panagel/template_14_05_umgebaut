@@ -47,7 +47,17 @@ function warumNicht(p) {
 // faellt schon vor dem Abruf heraus.
 async function bambu(cfg, log) {
   const hinweise = [];
-  const seiten = new Set((cfg.seiten || []).map(s => cfg.basis + s));
+  // Nach Pfad entdoppeln: die Sitemap nennt die Adressen des Shops, auf den
+  // umgeleitet wurde, die Konfiguration die des EU-Hosts. Beides ist
+  // dieselbe Seite und muss nicht zweimal geholt werden.
+  const seiten = new Map();
+  const nimmSeite = u => {
+    try {
+      const pfad = new URL(u).pathname.replace(/\/+$/, '');
+      if (!seiten.has(pfad)) seiten.set(pfad, u);
+    } catch (e) { /* unbrauchbare Adresse */ }
+  };
+  for (const s of (cfg.seiten || [])) nimmSeite(cfg.basis + s);
 
   const sm = await get(cfg.basis + cfg.sitemap);
   if (sm.status === 200 && sm.body) {
@@ -57,7 +67,7 @@ async function bambu(cfg, log) {
       const slug = (m[1].match(/\/products\/([^/?#]+)\/?$/) || [])[1];
       if (!slug || !CFG.modellSlugRe.test(slug)) continue;
       if (CFG.ausschlussRe.test(slug.replace(/[-_]/g, ' '))) continue;
-      seiten.add(m[1]);
+      nimmSeite(m[1]);
       gefunden++;
     }
     log('    Sitemap: ' + gefunden + ' Modellseite(n) von ' + (sm.body.match(/<loc>/g) || []).length);
@@ -69,7 +79,7 @@ async function bambu(cfg, log) {
 
   const produkte = [], verworfen = [];
   const gesehen = new Set();
-  for (const url of seiten) {
+  for (const url of seiten.values()) {
     const r = await get(url);
     if (r.status !== 200 || !r.body) {
       hinweise.push(url.replace(cfg.basis, '') + ': HTTP ' + r.status);
@@ -161,7 +171,17 @@ async function haendler(cfg, log) {
 // Wortgrenzen sind Pflicht: ohne sie steckt "sale" in "wholesale" und
 // "deal" in "dealer". Der Bambu-Shop ist englisch, die Haendler sind
 // deutsch - beide Sprachen muessen rein.
-const AKTION_RE = /(black\s*friday|cyber\s*(?:monday|week)|singles[\s-]*day|double\s*1?11|prime\s*day|winter[\s-]*(?:sale|schlussverkauf)|sommer[\s-]*(?:sale|schlussverkauf)|summer[\s-]*sale|spring[\s-]*sale|autumn[\s-]*sale|fall[\s-]*sale|fr[uü]hjahr[s]?[\s-]*sale|herbst[\s-]*sale|jahres(?:end|abschluss|wechsel)[\s-]*sale|saison(?:end|start)[\s-]*sale|\bschlussverkauf\b|mid[\s-]*season[\s-]*sale|end[\s-]*of[\s-]*season|season[\s-]*(?:sale|finale)|sale[\s-]*finale|final[\s-]*sale|super[\s-]*sale|mega[\s-]*sale|clearance|\bostern\b|oster[\s-]*(?:sale|aktion|deal)|easter[\s-]*sale|\bweihnacht(?:s[\s-]*(?:sale|aktion))?|christmas[\s-]*sale|x-?mas[\s-]*sale|\badvent(?:s[\s-]*(?:sale|aktion))?\b|jubil[aä]um|anniversary[\s-]*sale|lagerverkauf|r[aä]umungsverkauf|deal[\s-]*(?:days|week)|aktionswoche|flash[\s-]*sale|back[\s-]*to[\s-]*school|maker[\s-]*(?:days|fest|week)|creator[\s-]*(?:days|fest)|bundle[\s-]*(?:deal|sale|angebot)|trade[\s-]*in|launch[\s-]*(?:sale|angebot|offer)|preissenkung|price[\s-]*(?:drop|cut))/i;
+const AKTION_RE = /(black\s*friday|cyber\s*(?:monday|week)|singles[\s-]*day|double\s*1?11|prime\s*day|winter[\s-]*(?:sale|schlussverkauf)|sommer[\s-]*(?:sale|schlussverkauf)|summer[\s-]*sale|spring[\s-]*sale|autumn[\s-]*sale|fall[\s-]*sale|fr[uü]hjahr[s]?[\s-]*sale|herbst[\s-]*sale|jahres(?:end|abschluss|wechsel)[\s-]*sale|saison(?:end|start)[\s-]*sale|\bschlussverkauf\b|mid[\s-]*season[\s-]*sale|end[\s-]*of[\s-]*season|season[\s-]*(?:sale|finale)|sale[\s-]*finale|final[\s-]*sale|super[\s-]*sale|mega[\s-]*sale|clearance|\bostern\b|oster[\s-]*(?:sale|aktion|deal)|easter[\s-]*sale|\bweihnacht(?:s[\s-]*(?:sale|aktion))?|christmas[\s-]*sale|x-?mas[\s-]*sale|\badvent(?:s[\s-]*(?:sale|aktion))?\b|jubil[aä]um|anniversary[\s-]*sale|lagerverkauf|r[aä]umungsverkauf|deal[\s-]*(?:days|week)|aktionswoche|flash[\s-]*sale|back[\s-]*to[\s-]*school|maker[\s-]*(?:days|fest|week)|creator[\s-]*(?:days|fest)|bundle[\s-]*(?:deal|sale|angebot)|trade[\s-]*in|launch[\s-]*(?:sale|angebot|offer))/i;
+
+// "Price Drop" steht bewusst nicht in der Liste oben: eine Preissenkung
+// erkennt Signal 1 an den Zahlen selbst, viel genauer als jede Werbezeile.
+// Im Bambu-Shop steht "Price Drop Alert!" als Dauerwerbung fuer Filament.
+
+// Beworben wird im Herstellershop meist Verbrauchsmaterial. Das laeuft
+// dauerhaft und sagt ueber den Druckerpreis nichts aus - solche Zeilen
+// fliegen raus, sofern sie nicht doch ein Geraet nennen.
+const VERBRAUCH_RE = /filament|\brolls?\b|\bspools?\b|resin|\bink\b|add-?ons?|essentials|accessor|zubeh[oö]r|verbrauchsmaterial|d[uü]sen|nozzles/i;
+const GERAET_RE = /\bh2[dscx]\b|\bdrucker\b|printers?\b|\bmaschine|laser\s*(?:engrav|cutt|combo)|ger[aä]t/i;
 
 const PROZENT_RE = /(?:bis\s*zu\s*|up\s*to\s*)?-?\s?(\d{1,2})\s?%/;
 const CODE_RE = /\b(?:code|gutschein|coupon)[:\s]*([A-Z0-9][A-Z0-9_-]{3,19})\b/i;
@@ -227,8 +247,12 @@ function sammleBanner(html) {
     // Nur melden, was nach Kampagne aussieht: ein Aktionswort, oder ein
     // Rabatt, der ueber eine einzelne Artikelauszeichnung hinausgeht.
     if (!aktM && !(prozent && prozent >= CFG.kampagneMinProzent && BREIT_RE.test(kurz))) continue;
-    // Newsletter- und Versandwerbung laeuft dauerhaft und ist keine Aktion.
-    if (!aktM && /newsletter|anmeld|registrier|sign\s*up|subscribe|app[\s-]*download|versandkosten|free\s*shipping/i.test(kurz)) continue;
+    // Newsletter-, Empfehlungs- und Versandwerbung laeuft dauerhaft und ist
+    // keine Aktion.
+    if (!aktM && /newsletter|anmeld|registrier|sign\s*up|subscribe|refer\s*(?:now|a\s*friend)|freund|app[\s-]*download|versandkosten|free\s*shipping/i.test(kurz)) continue;
+    // Werbung fuer Verbrauchsmaterial: nur behalten, wenn auch ein Geraet
+    // vorkommt.
+    if (VERBRAUCH_RE.test(kurz) && !GERAET_RE.test(kurz)) continue;
     // Drei Prozentangaben nebeneinander sind die Rabattspalte des Filters.
     if ((kurz.match(/\d{1,2}\s?%/g) || []).length >= 3) continue;
     // Zwei Preise im Fenster heissen: das ist die Produktliste.

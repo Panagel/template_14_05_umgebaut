@@ -25,8 +25,8 @@ module.exports = {
     '\\b(?:nozzle|hotend|heatbed|bed\\s*plate|build\\s*plate|sheet|filament|spool|belt|fan',
     '|camera|goggles|cover|door|screw|adapter|holder|mount|bag|sticker|mat|cleaner|maintenance',
     '|spare|kit|set|set\\s*of|accessor|warranty|protection\\s*plan|shipping|gift\\s*card|tube',
-    '|unit|board|sensor|module|upgrade|refill|ptfe|zubeh[oö]r|ersatz|garantie|wartung|schutz',
-    '|deckel|t[uü]r|schraube|spule|aufkleber|nachr[uü]st|versand|gutschein)\\b',
+    '|unit|board|sensor|module|upgrade|refill|ptfe|toolbox|tool\\s*box|hardware|zubeh[oö]r|ersatz',
+    '|deckel|t[uü]r|schraube|spule|aufkleber|nachr[uü]st)\\b',
     '|[a-zäöüß]*(?:d[uü]se|modul|platte|platine|kabel|matte|riemen|filter|halter|tasche|schlauch',
     '|reiniger|bl[oö]cker|geh[aä]use|glas|brille|beutel|lager|einheit)n?\\b',
     // Und andersherum: "Garantieverlaengerung" haengt hinten an, nicht vorn.

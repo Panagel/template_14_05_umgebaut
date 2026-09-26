@@ -220,9 +220,16 @@ function produkteAusJsonLd(html, basis) {
     if (a.jetzt === null) continue;
     let url = o.url || (o.offers && !Array.isArray(o.offers) ? o.offers.url : null) || null;
     if (url && !/^https?:/i.test(url)) url = basis + (url.startsWith('/') ? '' : '/') + url;
+    // Eine eigene Artikelnummer ist der beste Schluessel: sie ueberlebt
+    // Umbenennungen. Fehlt sie, muss der Name mit hinein - bei einer
+    // ProductGroup zeigen alle Varianten auf dieselbe Adresse, und vier
+    // Ausbaustufen unter einem Schluessel wuerden sich gegenseitig
+    // ueberschreiben.
+    const nummer = String(o.sku || o.mpn || o.gtin13 || o.productID || '').trim();
+    const name = unent(String(o.name || '')).trim();
     out.push({
-      id: String(o.sku || o.mpn || o.gtin13 || o.productID || url || o.name || '').slice(0, 80),
-      name: unent(String(o.name || '')).trim(),
+      id: (nummer || (url || '') + '#' + name.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 40)).slice(0, 120),
+      name: name,
       jetzt: a.jetzt,
       vorher: a.vorher,
       waehrung: a.waehrung,
