@@ -1,5 +1,5 @@
 {
- "datum": "2026-09-27",
+ "datum": "2026-09-28",
  "meldungen": [],
  "uebersicht": [
   {
@@ -29,7 +29,7 @@
      "vorher": "1.749,00 USD",
      "rabatt": 16,
      "bestpreis": "1.469,00 USD",
-     "verfuegbar": "ja",
+     "verfuegbar": "nein",
      "url": "https://us.store.bambulab.com/products/refurbished-bambu-lab-h2d-3d-printer?id=776282589202808834"
     }
    ]
