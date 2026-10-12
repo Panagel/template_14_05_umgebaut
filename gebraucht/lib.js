@@ -250,7 +250,12 @@ function parseDetail(html, id) {
   const neuware = (!st || st.art === 'neu') && (
     (st && st.art === 'neu') || /^neu$/i.test(zustand || '') ||
     (gewerblich && /\bneu\b|neuware|neuger[aä]t/i.test(title)));
-  const defekt = /^defekt$/i.test(zustand || '') || /\bdefekt\b|bastler|f[uü]r\s*teile|ersatzteilspender|startet\s*nicht/i.test(blob) && !/nicht\s*defekt|keine\s*defekte/i.test(blob);
+  // Defekt: das Zustandsfeld, der Titel, oder eine eindeutige Formulierung im
+  // Text. "Defekt" irgendwo in der Beschreibung reicht nicht - "Duese war
+  // defekt und ist getauscht" beschreibt ein funktionierendes Geraet.
+  const defekt = /^defekt$/i.test(zustand || '') ||
+    (/defekt|bastler|ersatzteilspender|f[uü]r\s*teile/i.test(title) && !/nicht\s*defekt/i.test(title)) ||
+    /startet\s*nicht\s*mehr|f[uü]r\s*bastler|als\s*ersatzteil(?:spender|tr[aä]ger)|nicht\s*(?:mehr\s*)?funktionsf[aä]hig|ohne\s*funktion/i.test(desc);
 
   return {
     id: id, gone: false,
