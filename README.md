@@ -44,6 +44,15 @@ nur nicht mehr angezeigt. Wer sie wieder einschaltet, hat die Vorgeschichte
 noch; erst nach 120 Laufen ohne Sichtung raeumt der Watcher die Variante
 endgueltig aus.
 
+## Gebrauchtmarkt
+
+Zusaetzlich laeuft derselbe Suchlauf wie beim F900R-Monitor fuer
+**gebrauchte H2D mit AMS 2 Pro** auf Kleinanzeigen: taeglich erfassen,
+Standzeiten messen, montags ein Bericht per Push. Die im Anzeigentext
+genannten **Druckstunden** gehen in die Kalkulation ein — Wertverlust je
+Druckstunde, Schaetzpreis je Anzeige, guenstig/fair/teuer. Alles dazu in
+[`gebraucht/README.md`](gebraucht/README.md).
+
 ## Fuenf Signale
 
 **1. Tiefstpreis ueber alle Shops.** Die Meldung, auf die es ankommt:
@@ -372,6 +381,7 @@ geraeteunabhaengig.
 | `diag.js` | prueft, welche Shops dieses Netz durchlaesst |
 | `data/state.json` | Vorgeschichte je Variante, Tiefstpreise je Gruppe, Kampagnen |
 | `data/meldungen.json` | Ergebnis des letzten Laufs samt Tiefstpreis-Register |
+| `gebraucht/` | Gebrauchtmarkt auf Kleinanzeigen mit Druckstunden-Kalkulation, eigener Workflow **H2D-Gebrauchtmarkt** |
 
 `data/state.json` ist die Grundlage — **nicht loeschen**, sonst faengt die
 Bewertung bei null an: jede Variante gilt wieder als Erstsichtung, und alle

@@ -25,7 +25,7 @@ function saveState(st) {
 function angabenNachziehen(cur, d) {
   if (d.stunden != null) { cur.stunden = d.stunden; cur.stundenArt = d.stundenArt; cur.stundenText = d.stundenText; }
   if (d.alterMonate != null) cur.alterMonate = d.alterMonate;
-  for (const k of ['titel', 'zustand', 'klasse', 'ams', 'mehrereDrucker', 'neuware', 'defekt', 'beigaben', 'gewerblich']) {
+  for (const k of ['titel', 'zustand', 'klasse', 'ams', 'laserW', 'mehrereDrucker', 'neuware', 'defekt', 'beigaben', 'gewerblich']) {
     const v = k === 'titel' ? d.title : d[k];
     if (v != null && v !== '') cur[k] = v;
   }
@@ -34,6 +34,11 @@ function angabenNachziehen(cur, d) {
 async function main() {
   const T = today();
   const st = loadState();
+  // Wird der Filter schaerfer, fliegt raus, was nach heutigem Stand kein
+  // Drucker ist - sonst haelt die Nachpruefung es ewig am Leben.
+  for (const id of Object.keys(st.listings)) {
+    if (!L.istH2D(st.listings[id].titel)) { log('  x kein Drucker mehr: ' + st.listings[id].titel); delete st.listings[id]; }
+  }
   log('Scan ' + T + ' - Bestand bisher: ' + Object.keys(st.listings).length);
 
   // 1) Listen crawlen
@@ -76,7 +81,7 @@ async function main() {
         vb: d.vb, zustand: d.zustand,
         stunden: d.stunden, stundenArt: d.stundenArt, stundenText: d.stundenText,
         alterMonate: d.alterMonate,
-        klasse: d.klasse, ams: d.ams, mehrereDrucker: d.mehrereDrucker,
+        klasse: d.klasse, ams: d.ams, laserW: d.laserW, mehrereDrucker: d.mehrereDrucker,
         neuware: d.neuware, defekt: d.defekt,
         ort: d.ort, plz: d.plz, gewerblich: d.gewerblich,
         beigaben: d.beigaben,
@@ -128,6 +133,8 @@ async function main() {
         log('  - weg nach ' + (cur.standzeit != null ? cur.standzeit : cur.wegNach) + ' Tagen: ' + cur.preisAktuell + ' EUR  ' + (cur.titel || '').slice(0, 60));
         wegNeu++;
       }
+    } else if (!L.istH2D(v.title)) {
+      delete st.listings[v.id];
     } else {
       cur.zuletztGesehen = T;
       if (cur.fehlendSeit) { cur.fehlendSeit = null; wiederDa++; }

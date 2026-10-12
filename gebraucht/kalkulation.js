@@ -21,30 +21,41 @@ const med = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x
 const q = (a, p) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
 const rund = (v, s) => v == null ? null : Math.round(v / (s || 1)) * (s || 1);
 
-// Neupreis als Referenz. Der H2D-Watcher im selben Repo fuehrt ihn ohnehin:
-// der guenstigste aktuelle EUR-Preis einer neuen Combo (heute reichelt).
-// Faellt der aus, gilt der zuletzt gemessene Listenpreis.
-const NEUPREIS_FALLBACK = 1749;
+// Neupreise als Referenz. Der H2D-Watcher im selben Repo fuehrt sie ohnehin:
+// je Fassung der guenstigste aktuelle EUR-Preis (heute reichelt). Faellt er
+// aus, gilt der zuletzt gemessene Listenpreis.
+const NEUPREIS_FALLBACK = { combo: 1749, basis: 1549, laser10: 2149, laser40: 2549 };
 
-function neupreis() {
+function neupreise() {
+  const out = {};
   try {
     const { variantenKlasse } = require('../shops.js');
     const st = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'state.json'), 'utf8'));
-    let best = null;
     for (const [shop, s] of Object.entries(st.shops || {})) {
       for (const p of Object.values(s.produkte || {})) {
-        if (p.waehrung !== 'EUR' || variantenKlasse(p.name) !== 'combo') continue;
+        const k = variantenKlasse(p.name);
+        if (p.waehrung !== 'EUR' || !(k in NEUPREIS_FALLBACK)) continue;
         const l = p.verlauf && p.verlauf[p.verlauf.length - 1];
         if (!l || !l.jetzt) continue;
         // nur, was der Watcher in den letzten zwei Wochen noch gesehen hat
         if (p.zuletztGesehen && (Date.now() - new Date(p.zuletztGesehen)) / 86400000 > 14) continue;
         const eur = Math.round(l.jetzt / 100);
-        if (!best || eur < best.preis) best = { preis: eur, quelle: shop, name: p.name, datum: l.datum };
+        if (!out[k] || eur < out[k].preis) out[k] = { preis: eur, quelle: shop, name: p.name, datum: l.datum };
       }
     }
-    if (best) return best;
   } catch (e) { /* Watcher-Zustand fehlt - Fallback */ }
-  return { preis: NEUPREIS_FALLBACK, quelle: 'Listenpreis', name: 'H2D AMS Combo', datum: null };
+  for (const k of Object.keys(NEUPREIS_FALLBACK))
+    if (!out[k]) out[k] = { preis: NEUPREIS_FALLBACK[k], quelle: 'Listenpreis', name: k, datum: null };
+  return out;
+}
+const neupreis = () => neupreise().combo;
+
+// Zu welchem Neupreis gehoert eine Anzeige? Nur Fassungen mit eindeutigem
+// Gegenstueck im Laden; "mehrere AMS" oder "Laser ohne Wattangabe" nicht.
+function referenz(x) {
+  if (x.klasse === 'combo' || x.klasse === 'basis') return x.klasse;
+  if (x.klasse === 'laser' && x.laserW) return 'laser' + x.laserW;
+  return null;
 }
 
 // Theil-Sen: robuste Gerade durch (x, y).
@@ -77,25 +88,45 @@ function segmente(st) {
 // Fuer die Gerade zaehlen nur eindeutige Stundenangaben: keine Sammelanzeige
 // mit zwei Druckern (welche Stunden gehoeren zu welchem Preis?), keine
 // "unter 100h"-Obergrenze als Messwert, wenn genug echte Werte da sind.
-function stundenPunkte(arr) {
+function mitStunden(arr) {
   const p = arr.filter(x => x.stunden != null && !x.mehrereDrucker && x.stundenArt !== 'neu');
   const genau = p.filter(x => x.stundenArt !== 'max');
-  return (genau.length >= 4 ? genau : p).map(x => ({ x: x.stunden, y: x.preisAktuell, id: x.id }));
+  return genau.length >= 4 ? genau : p;
 }
+const spanneVon = pkt => pkt.length ? Math.max(...pkt.map(p => p.x)) - Math.min(...pkt.map(p => p.x)) : 0;
 
 function kalkulation(st, opt) {
   opt = opt || {};
-  const N = opt.neupreis || neupreis();
+  const NP = opt.neupreise || neupreise();
+  const N = NP.combo;
   const S = segmente(st);
-  // Gerade aus allen je gesehenen Combos - auch verkauften. Ein verkauftes
-  // Geraet war ein Angebot zu diesem Preis; die Datenbasis waechst so mit
-  // jeder Woche, statt bei den paar gerade aktiven stehen zu bleiben.
-  const pkt = stundenPunkte(S.combo);
-  const spanne = pkt.length ? Math.max(...pkt.map(p => p.x)) - Math.min(...pkt.map(p => p.x)) : 0;
-  let modell = null, modellArt = null;
-  if (pkt.length >= 3 && spanne >= 150) {
-    modell = theilSen(pkt);
-    modellArt = 'markt';
+
+  // Die Gerade nimmt alle je gesehenen Anzeigen - auch verkaufte. Ein
+  // verkauftes Geraet war ein Angebot zu diesem Preis; die Datenbasis waechst
+  // so mit jeder Woche, statt bei den paar gerade aktiven stehen zu bleiben.
+  //
+  // Erste Wahl: nur Combos, in Euro. Dafuer braucht es aber Masse, und der
+  // Markt ist klein. Bis dahin rechnet die Kalkulation ueber den Restwert
+  // aller gebrauchten H2D mit Stundenangabe - Combo, ohne AMS, Laser 10/40 W
+  // -, jeweils gegen den Neupreis ihrer eigenen Fassung, und rechnet das
+  // Ergebnis auf die Combo um. Ein Laser-Geraet mit 2.200 h sagt genauso
+  // etwas darueber, was Stunden kosten, wie eine Combo.
+  const combo = mitStunden(S.combo);
+  const pktCombo = combo.map(x => ({ x: x.stunden, y: x.preisAktuell, id: x.id, klasse: x.klasse }));
+  const pool = mitStunden(S.all.filter(x => referenz(x) && x.preisAktuell >= 500 && x.preisAktuell <= 5000 && !x.neuware && !x.defekt));
+  const pktPool = pool.map(x => ({ x: x.stunden, y: x.preisAktuell / NP[referenz(x)].preis, id: x.id, klasse: referenz(x) }));
+
+  let modell = null, modellArt = null, pkt = pktCombo;
+  if (pktCombo.length >= 5 && spanneVon(pktCombo) >= 300) {
+    modell = theilSen(pktCombo);
+    modellArt = 'combo';
+  } else if (pktPool.length >= 3 && spanneVon(pktPool) >= 150) {
+    const r = theilSen(pktPool);
+    if (r) {
+      modell = { a: r.a * N.preis, b: r.b * N.preis, n: r.n, restwertA: r.a, restwertB: r.b };
+      modellArt = 'restwert';
+      pkt = pktPool;
+    }
   }
   // Steigt der Preis mit den Stunden, ist das Rauschen, kein Effekt. Dann,
   // und solange zu wenige Punkte da sind, rechnet der Vergleich je Anzeige
@@ -137,14 +168,16 @@ function kalkulation(st, opt) {
   // Punkt hinaus ist geraten.
   const maxH = pkt.length ? Math.max(...pkt.map(p => p.x)) : 0;
   const prognose = modell && !modell.unplausibel
-    ? [0, 250, 500, 1000, 1500, 2000, 3000, 5000].filter((h, i, a) => h <= maxH || (i > 0 && a[i - 1] < maxH))
+    ? [0, 250, 500, 1000, 1500, 2000, 3000, 5000].filter(h => h <= maxH)
       .map(h => ({ h: h, preis: Math.max(0, modell.a + modell.b * h) }))
     : [];
 
   return {
     neupreis: N,
+    neupreise: NP,
     segmente: S,
     punkte: pkt,
+    punkteCombo: pktCombo,
     modell: modell,
     modellArt: modellArt,
     stundensatz: stundensatz,                 // EUR Wertverlust je Druckstunde
@@ -155,7 +188,7 @@ function kalkulation(st, opt) {
   };
 }
 
-module.exports = { kalkulation, neupreis, segmente, theilSen, med, q, rund };
+module.exports = { kalkulation, neupreis, neupreise, referenz, segmente, theilSen, med, q, rund };
 
 // ---------- Ausgabe auf der Konsole ----------
 if (require.main === module) {
@@ -163,13 +196,13 @@ if (require.main === module) {
   const K = kalkulation(st);
   const eur = v => v == null ? '-' : Math.round(v).toLocaleString('de-DE') + ' EUR';
   console.log('Neupreis Combo: ' + eur(K.neupreis.preis) + ' (' + K.neupreis.quelle + (K.neupreis.datum ? ', ' + K.neupreis.datum : '') + ')');
-  console.log('Gebrauchte Combos erfasst: ' + K.segmente.combo.length + ', aktiv ' + K.proAnzeige.length + ', mit Stunden ' + K.punkte.length);
+  console.log('Gebrauchte Combos erfasst: ' + K.segmente.combo.length + ', aktiv ' + K.proAnzeige.length + ', mit Stunden ' + K.punkteCombo.length);
   if (K.stundensatz != null) {
-    console.log('Modell (n=' + K.modell.n + '): Preis = ' + eur(K.modell.a) + ' - ' + K.stundensatz.toFixed(2) + ' EUR x Stunden');
+    console.log('Modell ' + K.modellArt + ' (n=' + K.modell.n + '): Preis Combo = ' + eur(K.modell.a) + ' - ' + K.stundensatz.toFixed(2) + ' EUR x Stunden');
     console.log('  -> je 100 Druckstunden ' + eur(K.stundensatz * 100) + ' Wertverlust, Gebrauchtabschlag ' + eur(K.gebrauchtAbschlag));
     for (const p of K.prognose) console.log('     ' + String(p.h).padStart(5) + ' h  ' + eur(p.preis));
   } else {
-    console.log('Noch kein Stundenmodell (' + K.punkte.length + ' Punkte' + (K.modell && K.modell.unplausibel ? ', Steigung unplausibel' : '') + ').' +
+    console.log('Noch kein Stundenmodell (' + K.punkte.length + ' Combo-Punkte' + (K.modell && K.modell.unplausibel ? ', Steigung unplausibel' : '') + ').' +
       (K.satzJeAnzeigeMedian != null ? ' Notbehelf: Median ' + eur(K.satzJeAnzeigeMedian) + ' je 100 h gegen Neupreis.' : ''));
   }
   console.log('');

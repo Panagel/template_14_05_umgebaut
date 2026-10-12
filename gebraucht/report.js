@@ -60,17 +60,38 @@ w('');
 w('Druckstunden sind beim Drucker, was beim Motorrad der Kilometerstand ist. Ein Formularfeld dafür gibt es nicht – die Stunden stammen aus dem Anzeigentext ("418 Stunden auf der Uhr", "ca. 300 Druckstunden").');
 w('');
 const mitStd = comboAktiv.filter(x => x.stunden != null).length;
-w('- Combos mit Stundenangabe: **' + K.punkte.length + '** für die Rechnung (aktiv: ' + mitStd + ' von ' + comboAktiv.length + ').');
+w('- Combos mit eindeutiger Stundenangabe: **' + K.punkteCombo.length + '** seit Beginn. Von den ' + comboAktiv.length + ' aktiven nennen ' + mitStd + ' ihre Stunden' +
+  (comboAktiv.some(x => x.mehrereDrucker && x.stunden != null) ? ' (Sammelanzeigen mitgezählt, aber nicht mitgerechnet)' : '') + '.');
 if (K.stundensatz != null) {
-  w('- Rechnung: **Preis ≈ ' + eur(K.modell.a) + ' − ' + K.stundensatz.toFixed(2).replace('.', ',') + ' € × Stunden** (robuste Gerade, n = ' + K.modell.n + ', aktive und verschwundene Anzeigen).');
+  if (K.modellArt === 'restwert') {
+    const nach = {};
+    K.punkte.forEach(p => { nach[p.klasse] = (nach[p.klasse] || 0) + 1; });
+    const NAMEN = { combo: 'Combo', basis: 'ohne AMS', laser10: 'Laser 10 W', laser40: 'Laser 40 W' };
+    w('- Für eine Rechnung nur aus Combos reicht das noch nicht. Bis dahin zählt der **Restwert aller gebrauchten H2D mit Stundenangabe** (' +
+      Object.entries(nach).map(([k, n]) => n + '× ' + NAMEN[k]).join(', ') + '), jeweils gegen den Neupreis der eigenen Fassung, umgerechnet auf die Combo.');
+    w('- Restwert ≈ **' + Math.round(100 * K.modell.restwertA) + ' % − ' + (-100 * K.modell.restwertB * 100).toFixed(1).replace('.', ',') + ' Prozentpunkte je 100 h**; für die Combo: **Preis ≈ ' + eur(K.modell.a) + ' − ' + K.stundensatz.toFixed(2).replace('.', ',') + ' € × Stunden** (robuste Gerade, n = ' + K.modell.n + ').');
+  } else {
+    w('- Rechnung: **Preis ≈ ' + eur(K.modell.a) + ' − ' + K.stundensatz.toFixed(2).replace('.', ',') + ' € × Stunden** (robuste Gerade über ' + K.modell.n + ' Combos, aktive und verschwundene Anzeigen).');
+  }
   w('');
-  w('| Druckstunden | erwarteter Preis | Restwert |');
+  w('| Druckstunden | erwarteter Preis Combo | Restwert |');
   w('|---|---|---|');
   for (const p of K.prognose) w('| ' + p.h.toLocaleString('de-DE') + ' h | ' + eur(p.preis) + ' | ' + Math.round(100 * p.preis / N.preis) + ' % |');
   w('');
   w('Lesart für einen Kauf: wer eine Combo mit 400 h kauft und sie nach weiteren 600 h wieder verkauft, verliert durch die Stunden etwa **' + eur(K.stundensatz * 600) + '** – unabhängig vom Einstiegspreis.');
+  w('');
+  w('Messpunkte der Rechnung:');
+  w('');
+  w('| Fassung | Stunden | Preis | Restwert | Anzeige |');
+  w('|---|---|---|---|---|');
+  const byId = {}; all.forEach(x => { byId[x.id] = x; });
+  K.punkte.slice().sort((a, b) => a.x - b.x).forEach(p => {
+    const x = byId[p.id];
+    const ref = K.neupreise[require('./kalkulation.js').referenz(x)] || N;
+    w('| ' + (KLASSEN[x.klasse] || x.klasse) + (x.laserW ? ' ' + x.laserW + ' W' : '') + ' | ' + std(x) + ' | ' + eur(x.preisAktuell) + ' | ' + Math.round(100 * x.preisAktuell / ref.preis) + ' % von ' + eur(ref.preis) + ' | ' + link(x) + (x.weg ? ' (weg)' : '') + ' |');
+  });
 } else {
-  w('- _Noch kein belastbares Stundenmodell: es braucht mindestens drei Combos mit Stundenangabe und einer Spanne von 150 h' +
+  w('- _Noch kein belastbares Stundenmodell: es braucht mindestens drei gebrauchte H2D mit Stundenangabe und einer Spanne von 150 h' +
     (K.modell && K.modell.unplausibel ? '; die bisherigen Punkte zeigen keinen fallenden Preis mit steigenden Stunden' : '') + '._');
   if (K.satzJeAnzeigeMedian != null)
     w('- Notbehelf gegen den Neupreis gerechnet: Median **' + eur(K.satzJeAnzeigeMedian) + ' je 100 h**. Das überschätzt den Stundensatz, weil der Abschlag fürs Gebrauchtsein mit drinsteckt.');

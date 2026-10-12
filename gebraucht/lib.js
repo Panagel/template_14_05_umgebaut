@@ -74,6 +74,12 @@ function istH2D(title) {
   if (!/bambu|drucker|printer|\bams|combo|3d/i.test(t)) return false;
   if (/turbolader|holset|movano|ducato|kasten|transporter|z[aä]hler|heliowatt|nest\s*wifi/i.test(s)) return false;
   // Umbausaetze und Ersatzteile, die den Drucker im Titel nennen
+  // Lasermodul allein ("40W Lasermodul inkl. Zubehoer", "Lasermodul fuer
+  // H2C / H2D") ist kein Drucker - die Laser Full Combo nennt dagegen
+  // Combo, AMS oder Drucker mit.
+  if (/laser\s*-?\s*modul|laser\s*module|laser\s*kit/i.test(s) && !/combo|drucker|printer|\bams|edition/i.test(s)) return false;
+  // "... fuer H2C / H2D" ist Zubehoer
+  if (/\bf(?:ü|ue|u)r\s+(?:den\s+|die\s+)?(?:bambu\s*(?:lab\s*)?)?h2[a-z]/i.test(s) && !/drucker|printer|combo/i.test(s)) return false;
   if (/upgrade\s*(?:zu|auf|kit)|\bzu\s*h2c\b|hotend|heizbett|heatbed|\bboard\b|platine|d[uü]se|nozzle|druckplatte|build\s*plate|filament|rfid|ersatzteil|st[aä]nder|halter|geh[aä]use(?:teil)?|abdeckung|\bt[uü]r\b|ptfe|\bkabel/i.test(s)) return false;
   return true;
 }
@@ -128,6 +134,10 @@ function ausbau(title, desc) {
     pro: /h2d\s*pro\b/i.test(t),
     laser: /laser/i.test(t) || /laser[\s-]*(?:full[\s-]*)?combo|laser[\s-]*(?:modul|kit|upgrade)|\b(?:10|40)\s*-?\s*w(?:att)?[\s-]*laser/i.test(d),
     amsHT: /\bams\s*ht\b/i.test(beides),
+    // Leistung des Lasers, fuer den passenden Neupreis
+    laserW: /\b40\s*-?\s*w(?:att)?\b/i.test(t) ? 40 : /\b10\s*-?\s*w(?:att)?\b/i.test(t) ? 10
+      : /\b40\s*-?\s*w(?:att)?[\s-]*laser|laser\w*[\s-]*(?:mit\s*)?40\s*-?\s*w/i.test(d) ? 40
+      : /\b10\s*-?\s*w(?:att)?[\s-]*laser|laser\w*[\s-]*(?:mit\s*)?10\s*-?\s*w/i.test(d) ? 10 : null,
     ams: amsAnzahl(t),
     mehrereDrucker: /\b(?:2|zwei|3|drei)\s*x?\s*(?:st[uü]ck\s*)?(?:bambu\w*\s*)?(?:lab\s*)?h2d/i.test(t) || /preis\s*(?:gilt\s*)?(?:pro|je)\s*drucker/i.test(d)
   };
@@ -261,6 +271,7 @@ function parseDetail(html, id) {
     defekt: !!defekt,
     klasse: aus.klasse,
     ams: aus.ams,
+    laserW: aus.klasse === 'laser' ? aus.laserW : null,
     mehrereDrucker: aus.mehrereDrucker,
     beigaben: beig,
     descLen: desc.length
