@@ -2,14 +2,18 @@ name: Probe Gebrauchtmarkt (temporaer)
 on:
   push:
     branches: [ccr-c2cf7694-ouhzwa]
-    paths: ['gebraucht/probe.js', '.github/workflows/probe-gebraucht.yml']
+    paths: ['gebraucht/**', '.github/workflows/probe-gebraucht.yml']
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node gebraucht/probe.js
+      - run: node gebraucht/scan.js
+      - run: node gebraucht/kalkulation.js
+      - run: node gebraucht/report.js 2>&1
+      - name: Rohdaten
+        run: node -e "const s=require('./gebraucht/data/state.json');for(const x of Object.values(s.listings))console.log(JSON.stringify({p:x.preisAktuell,k:x.klasse,ams:x.ams,h:x.stunden,ha:x.stundenArt,ht:x.stundenText,alt:x.alterMonate,neu:x.neuware,def:x.defekt,z:x.zustand,g:x.gewerblich,m:x.mehrereDrucker,t:x.titel}))"
