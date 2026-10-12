@@ -102,6 +102,27 @@ Bei einer Sammelanzeige („4530h 2439h", zwei Drucker zu je 1.400 EUR) ist
 offen, welche Stunden zu welchem Preis gehören: sie bleibt aus der Gerade
 heraus und bekommt kein Urteil.
 
+## Sofortmeldung
+
+Taucht eine gebrauchte Combo auf, die günstig ist, kommt sofort eine Meldung
+aufs Handy — nicht erst mit dem Wochenbericht:
+
+- **mit Stundenangabe und Stundenmodell:** mindestens 7 % unter dem
+  Schätzpreis für diese Stunden
+- **ohne Stunden oder solange es kein Modell gibt:** höchstens 80 % vom
+  Neupreis (derzeit also bis 1.399 EUR)
+
+```
+Guenstige H2D Combo: 1.250 EUR, 600 h
+  - 10 % unter dem Schaetzpreis fuer 600 h (1.389 EUR)
+  - Wertverlust je 100 h laut Kalkulation: 6 EUR
+```
+
+Jede Anzeige meldet einmal; erneut erst, wenn ihr Preis unter den zuletzt
+gemeldeten fällt. Sammelanzeigen mehrerer Drucker melden nicht, und beim
+allerersten Lauf schweigt die Meldung — da ist der ganze Markt neu. Die
+Schwellen stehen oben in `scan.js` (`ALARM_ABWEICHUNG`, `ALARM_RESTWERT_MAX`).
+
 ## Bericht und Push
 
 Montags (oder von Hand mit `bericht = true`) entsteht
@@ -141,6 +162,7 @@ Zeitplan nur vom Standardbranch aus.
 | `kalkulation.js` | Stundenmodell, Schätzwerte, Neupreis-Referenz |
 | `report.js` | Wochenbericht nach `berichte/` |
 | `notify.js` | Kurzfassung per ntfy und Telegram |
+| `alarm.js` | Sofortmeldung günstiger Combos aus `data/meldungen.json` |
 
 ## Fallstricke
 

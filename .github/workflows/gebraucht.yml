@@ -60,6 +60,14 @@ jobs:
             git push
           fi
 
+      - name: Sofortmeldung guenstige Combo
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node gebraucht/alarm.js
+
       - name: Push-Benachrichtigung
         if: steps.bericht.outputs.erzeugt == 'ja'
         env:

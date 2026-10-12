@@ -50,7 +50,8 @@ Zusaetzlich laeuft derselbe Suchlauf wie beim F900R-Monitor fuer
 **gebrauchte H2D mit AMS 2 Pro** auf Kleinanzeigen: taeglich erfassen,
 Standzeiten messen, montags ein Bericht per Push. Die im Anzeigentext
 genannten **Druckstunden** gehen in die Kalkulation ein — Wertverlust je
-Druckstunde, Schaetzpreis je Anzeige, guenstig/fair/teuer. Alles dazu in
+Druckstunde, Schaetzpreis je Anzeige, guenstig/fair/teuer. Eine guenstige
+Combo meldet sich sofort. Alles dazu in
 [`gebraucht/README.md`](gebraucht/README.md).
 
 ## Fuenf Signale

@@ -3,9 +3,18 @@
 const fs = require('fs');
 const path = require('path');
 const L = require('./lib.js');
+const { kalkulation } = require('./kalkulation.js');
 
 const DATA = path.join(__dirname, 'data');
 const STATE = path.join(DATA, 'state.json');
+const MELD = path.join(DATA, 'meldungen.json');
+
+// Sofortmeldung fuer eine guenstige gebrauchte Combo. Mit Stundenangabe
+// zaehlt die Kalkulation (7 % unter dem Schaetzpreis fuer diese Stunden),
+// ohne Stunden oder solange es kein Stundenmodell gibt die Schwelle gegen
+// den Neupreis.
+const ALARM_ABWEICHUNG = -0.07;
+const ALARM_RESTWERT_MAX = 0.80;
 
 const today = () => new Date().toISOString().slice(0, 10);
 const log = m => console.log('[' + new Date().toISOString().slice(11, 19) + '] ' + m);
@@ -34,6 +43,9 @@ function angabenNachziehen(cur, d) {
 async function main() {
   const T = today();
   const st = loadState();
+  // Beim ersten Lauf ist alles neu - da wird nichts gemeldet, sonst kommt
+  // der ganze Markt auf einmal aufs Handy.
+  const ersterLauf = Object.keys(st.listings).length === 0;
   // Wird der Filter schaerfer, fliegt raus, was nach heutigem Stand kein
   // Drucker ist - sonst haelt die Nachpruefung es ewig am Leben.
   for (const id of Object.keys(st.listings)) {
@@ -159,10 +171,47 @@ async function main() {
   } else {
     st.runs.push(eintrag);
   }
-  if (!process.env.TROCKEN) saveState(st);
+  const meldungen = ersterLauf ? [] : schnaeppchen(st, T);
+  for (const m of meldungen) log('  ! ' + m.titel);
+  if (!process.env.TROCKEN) {
+    saveState(st);
+    fs.writeFileSync(MELD, JSON.stringify({ datum: T, meldungen: meldungen }, null, 1));
+  }
 
   log('FERTIG: aktiv=' + aktivGesamt + ' neu=' + neu + ' verschwunden=' + wegNeu +
       ' (Verdacht offen: ' + verdacht + ', wieder aufgetaucht: ' + wiederDa + ') preisAenderungen=' + preisAenderungen);
+}
+
+// Welche aktive gebrauchte Combo ist guenstig? Gemeldet wird eine Anzeige
+// einmal; erneut erst, wenn ihr Preis unter den zuletzt gemeldeten faellt.
+function schnaeppchen(st, T) {
+  const K = kalkulation(st);
+  const eur = v => Math.round(v).toLocaleString('de-DE') + ' EUR';
+  const out = [];
+  for (const r of K.proAnzeige) {
+    const x = st.listings[r.id];
+    if (!x || x.zuletztGesehen !== T || r.mehrereDrucker) continue;
+    if (x.gemeldetBei != null && r.preis >= x.gemeldetBei) continue;
+    const gruende = [];
+    if (r.abweichung != null) {
+      if (r.abweichung > ALARM_ABWEICHUNG) continue;
+      gruende.push(Math.round(-100 * r.abweichung) + ' % unter dem Schaetzpreis fuer ' + r.stunden + ' h (' + eur(r.schaetzwert) + ')');
+    } else {
+      if (r.restwert > ALARM_RESTWERT_MAX) continue;
+      gruende.push(Math.round(100 * r.restwert) + ' % vom Neupreis (' + eur(K.neupreis.preis) + ')' +
+        (r.stunden == null ? ', Stunden nicht genannt' : ''));
+      if (r.impliziteStunden != null) gruende.push('der Preis passt zu etwa ' + Math.round(r.impliziteStunden / 10) * 10 + ' Druckstunden');
+    }
+    if (x.preisVerlauf.length > 1 && x.preisErst > r.preis) gruende.push('gesenkt von ' + eur(x.preisErst));
+    if (K.stundensatz != null) gruende.push('Wertverlust je 100 h laut Kalkulation: ' + eur(K.stundensatz * 100));
+    x.gemeldetBei = r.preis;
+    out.push({
+      titel: 'Guenstige H2D Combo: ' + eur(r.preis) + (r.vb ? ' VB' : '') + ', ' + (r.stunden != null ? r.stunden + ' h' : 'Stunden ?'),
+      name: r.titel, ort: r.ort, gewerblich: r.gewerblich, gruende: gruende,
+      url: 'https://www.kleinanzeigen.de' + r.href
+    });
+  }
+  return out;
 }
 
 main().catch(e => { console.error('FEHLER', e); process.exit(1); });
