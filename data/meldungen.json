@@ -1,6 +1,28 @@
 {
  "datum": "2026-10-19",
- "meldungen": [],
+ "meldungen": [
+  {
+   "typ": "verfuegbar",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "url": "https://us.store.bambulab.com/products/refurbished-bambu-lab-h2d-3d-printer?id=776282589202808834",
+   "titel": "Bambu Lab Store (US-Ansicht): [Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo wieder lieferbar",
+   "gruende": [
+    "Wieder lieferbar (vorher: nicht lieferbar)",
+    "Preise des US-Shops - der Runner steht in den USA. Als Fruehwarnung brauchbar, weil Bambu seine Aktionen global faehrt."
+   ],
+   "produkte": [
+    {
+     "name": "[Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo",
+     "jetzt": "1.469,00 USD",
+     "vorher": "1.749,00 USD",
+     "rabatt": 16,
+     "bestpreis": "1.469,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/refurbished-bambu-lab-h2d-3d-printer?id=776282589202808834"
+    }
+   ]
+  }
+ ],
  "uebersicht": [
   {
    "shop": "Bambu Lab Store (US-Ansicht)",
@@ -29,7 +51,7 @@
      "vorher": "1.749,00 USD",
      "rabatt": 16,
      "bestpreis": "1.469,00 USD",
-     "verfuegbar": "nein",
+     "verfuegbar": "ja",
      "url": "https://us.store.bambulab.com/products/refurbished-bambu-lab-h2d-3d-printer?id=776282589202808834"
     }
    ]
