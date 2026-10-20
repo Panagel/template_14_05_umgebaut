@@ -43,7 +43,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   },
   "3486031884": {
    "id": "3486031884",
@@ -88,7 +90,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   },
   "3504051701": {
    "id": "3504051701",
@@ -133,7 +137,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   },
   "3504052481": {
    "id": "3504052481",
@@ -178,7 +184,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   },
   "3506719429": {
    "id": "3506719429",
@@ -223,7 +231,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   },
   "3527631832": {
    "id": "3527631832",
@@ -268,7 +278,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   },
   "3530427146": {
    "id": "3530427146",
@@ -313,7 +325,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   },
   "3543519066": {
    "id": "3543519066",
@@ -358,7 +372,9 @@
    },
    "weg": false,
    "wegSeit": null,
-   "wegNach": null
+   "wegNach": null,
+   "fehlendSeit": null,
+   "standzeit": null
   }
  },
  "runs": [
