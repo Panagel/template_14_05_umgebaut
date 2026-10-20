@@ -45,11 +45,31 @@ module.exports = {
     'vorverkauf\\s+(?:hat\\s+begonnen|l[aä]uft|ist\\s+er[oö]ffnet|gestartet)',
     '|(?:tickets?|karten|vvk)[^.!?]{0,40}\\bab\\s+sofort\\b',
     '|\\bab\\s+sofort\\b[^.!?]{0,40}(?:tickets?|karten|erh[aä]ltlich)',
-    '|(?:tickets?|karten)[^.!?]{0,30}(?:sind\\s+)?(?:jetzt\\s+)?(?:erh[aä]ltlich|verf[uü]gbar|im\\s+vorverkauf|zu\\s+haben)',
+    // Das Fenster ist mit Absicht weit: der Veranstalter schreibt "Tickets
+    // sind bundesweit an allen CTS Eventim Vorverkaufsstellen erhaeltlich" -
+    // 56 Zeichen zwischen Wort und Verb. Mit 30 fiel genau dieser Satz
+    // durch, gemessen am 20.10.2026. Ueber einen Satz hinaus kann das
+    // Fenster nicht reichen, dafuer sorgt [^.!?].
+    '|(?:tickets?|karten)[^.!?]{0,80}(?:sind\\s+)?(?:jetzt\\s+)?(?:erh[aä]ltlich|verf[uü]gbar|im\\s+vorverkauf|zu\\s+haben)',
     '|jetzt\\s+(?:tickets?|karten)\\s+(?:sichern|kaufen|bestellen|holen)',
     '|(?:tickets?|karten)\\s+(?:jetzt\\s+)?(?:sichern|kaufen|bestellen)',
     '|in\\s+den\\s+warenkorb|zur\\s+kasse|tickets?\\s+w[aä]hlen',
     '|\\bpresale\\s+(?:is\\s+)?(?:live|open|started)|tickets?\\s+on\\s+sale'
+  ].join(''), 'i'),
+
+  // Eine Preiszeile mit Vorverkaufsetikett: "Vorverkauf: 122,00 EUR |
+  // Abendkasse: tba". Kein Satz, sondern eine Tabellenzeile - und trotzdem
+  // die klarste Aussage, dass verkauft wird. So und nicht anders steht es
+  // auf der Seite des Veranstalters (gemessen am 20.10.2026).
+  //
+  // Sie zaehlt nur unter zwei Bedingungen, beide in ticket-quellen.js: der
+  // Betrag muss als Kartenpreis plausibel sein, und auf derselben Seite muss
+  // ein Termin stehen, der noch kommt. Denn auf der Archivseite der Ausgabe
+  // 2025 steht dieselbe Zeile, nur mit dem Preis von damals.
+  preisHinweisRe: new RegExp([
+    '(?:vorverkauf|vvk|tickets?|karten|eintritt|festivalticket)s?\\s*(?:preis)?\\s*[:=]?\\s*(?:ab\\s+)?',
+    '(?:€|eur|euro)?\\s*\\d{1,3}(?:[.,]\\d{2})?\\s*(?:€|eur|euro)',
+    '|(?:€|eur|euro)\\s*\\d{1,3}(?:[.,]\\d{2})?\\s*(?:im\\s+)?(?:vorverkauf|vvk)'
   ].join(''), 'i'),
 
   // Gegenprobe. Steht das im selben Satz, zaehlt der Satz nicht als

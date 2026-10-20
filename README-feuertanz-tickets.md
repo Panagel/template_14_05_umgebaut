@@ -17,24 +17,36 @@ Secrets — ist der Preiswatcher eingerichtet, ist die Ticketwache es auch.
 > mittelfraenkischen Abenberg bei Nuernberg, kein Schloss und kein
 > Abendberg — deshalb sucht die Wache nach `abenberg`.
 
-## Der Stand, von dem aus die Wache startet
+## Der Stand
 
-Recherchiert am 26.09.2026. Die Seite des Veranstalters selbst war aus der
-Entwicklungsumgebung nicht abrufbar (die Netzfreigabe dieser Umgebung
-erlaubt `www.feuertanz-festival.com` nicht), die Angaben stammen deshalb aus
-der Websuche. Auf einem GitHub-Runner gilt diese Sperre nicht.
+Recherchiert am 20.10.2026 ueber die Websuche. Die Seiten selbst sind aus
+der Entwicklungsumgebung nicht abrufbar (die Netzfreigabe erlaubt
+`www.feuertanz-festival.com`, `www.concertbuero-franken.de`,
+`www.eventim.de` und `www.reservix.de` nicht) — auf einem GitHub-Runner gilt
+diese Sperre nicht.
 
 | Ausgabe | Termin | Karten |
 |---|---|---|
 | 2025 | 13./14. Juni 2025 | vorbei |
-| 2026 | 12./13. Juni 2026 | vorbei, war **ausverkauft** |
-| **2027** | **noch nicht offiziell bestaetigt** — ein Fremdkalender fuehrt Fr./Sa., 25./26. Juni 2027 | **noch kein Vorverkauf** |
+| 2026 | 12./13. Juni 2026 | vorbei, war ausverkauft |
+| **2027** | **11.+12. Juni 2027** | **Vorverkauf laeuft** seit etwa dem 05.10.2026, 122,00 EUR inkl. Gebuehren, Abendkasse noch offen |
 
-Das ist genau die Lage, fuer die diese Wache gebaut ist: der Termin steht
-noch nicht fest, der Vorverkauf hat nicht begonnen, und wenn er beginnt, ist
-das Festival erfahrungsgemaess schnell weg. Bis dahin bleibt die Wache
-still — Stille ist hier das erwartete Ergebnis, nicht ein Zeichen, dass
-nichts laeuft.
+Gekauft wird im Shop des Concertbuero Franken, telefonisch oder an den
+CTS-Eventim-Vorverkaufsstellen. Bemerkenswert und lehrreich: die
+Kuenstlerseite bei Eventim meldete am 20.10.2026 noch *"aktuell scheinen
+keine Termine im Vorverkauf zu sein"*, waehrend der Veranstalter laengst
+verkaufte. Genau deshalb ist dessen Seite die Leitquelle und ein Portal
+darf schweigen.
+
+**Dieser Vorverkaufsstart ist der Wache durchgegangen** — nicht weil sie ihn
+nicht erkannt haette, sondern weil sie nie gelaufen ist: der Zeitplan greift
+nur auf dem Standardbranch, und der zeigte weiter auf den Preiswatcher
+(siehe *Einrichtung*, Punkt 1). Am nachgebauten Stand vom 20.10.2026
+geprueft, meldet sie Termin und Karten mit dem richtigen Kauflink.
+
+Was fuer die Wache ab jetzt zu tun bleibt: melden, wenn 2027 **ausverkauft**
+ist, wenn sich der Termin aendert, wenn die Ticketseite etwas Neues sagt —
+und dann wieder der ganze Ablauf fuer die Ausgabe 2028.
 
 ## Fuenf Signale
 
@@ -129,15 +141,19 @@ Ticketportale duerfen ganz schweigen, ohne dass das Handy klingelt
 ## Einrichtung
 
 **1. Der Zeitplan laeuft nur auf dem Standardbranch.** Das ist GitHubs Regel,
-nicht die der Wache, und hier der einzige Handgriff, der wirklich noetig ist:
-Standardbranch dieses Repos ist derzeit `claude/h2d-bambulab-drucker-setup-ygc3pv`.
-Solange das so bleibt, faengt die Ticketwache nicht von allein an zu laufen.
+nicht die der Wache, und der einzige Handgriff, der wirklich noetig ist —
+solange er fehlt, faengt die Ticketwache nicht von allein an zu laufen.
+Standardbranch dieses Repos ist `claude/h2d-bambulab-drucker-setup-ygc3pv`.
 
-Unter *Settings → General → Default branch* auf
-`claude/feuertanzfestival-ticket-watcher-5jxgut` umstellen. Die Dateien des
-Preiswatchers liegen auf diesem Branch unveraendert mit drin und heissen
-anders (`scan.js` gegen `ticket-scan.js`, `data/` gegen `data-feuertanz/`) —
-**beide Wachen laufen danach**, jede mit ihrem eigenen Zeitplan.
+**Der Weg ist ein Merge, kein Branch-Wechsel.** Auf dem Standardbranch ist
+seit Ende September der H2D-Gebrauchtmarkt-Watcher dazugekommen
+(`gebraucht/`, Workflow *H2D-Gebrauchtmarkt*) — den gibt es auf dem
+Ticketbranch nicht. Wer den Standardbranch bloss umstellt, nimmt also den
+Gebrauchtmarkt-Watcher aus dem Zeitplan. Der Ticketbranch ist ein einzelner
+Commit, der fast nur Dateien hinzufuegt, und laesst sich konfliktfrei in den
+Standardbranch mergen (geprueft am 20.10.2026). Danach laufen **alle drei
+Wachen** nebeneinander, jede mit eigenem Zeitplan, eigenen Dateien und
+eigenem Datenverzeichnis: `data/`, `gebraucht/data/`, `data-feuertanz/`.
 
 **2. Secrets** (*Settings → Secrets and variables → Actions*) — dieselben wie
 beim Preiswatcher, nichts Neues, wenn der schon laeuft:
@@ -189,15 +205,16 @@ Meldungen: 2 | Quellen mit Daten: 2
 Und ohne Netz, in Sekunden, die Bewertung selbst:
 
 ```bash
-node ticket-selbsttest.js     # 50 Pruefungen, 12 Buehnen
+node ticket-selbsttest.js     # 68 Pruefungen, 14 Buehnen
 ```
 
 Der Selbsttest legt Seiten auf die Platte und laesst die Wache darauf laufen:
 vergangene Ausgabe, Termin wird bekannt, Vorverkauf angekuendigt, Karten laut
 Text, Karten laut Datenblock, ausverkauft schlaegt den Wortlaut, Rueckkehr in
-den Verkauf, umformulierte Seite, die Wortlaut-Tabelle aus Signal 3, Ruhe
-ohne Commit, und der Fall "Karten zuerst, Termin spaeter" — der darf nur
-einmal klingeln. Er laeuft in jedem Wachlauf mit — nach dem Melden, damit ein
+den Verkauf, umformulierte Seite, die Tabellen fuer Datumsschreibweisen und
+Wortlaute, Ruhe ohne Commit, der Fall "Karten zuerst, Termin spaeter" — der
+darf nur einmal klingeln — und die Preiszeile, die nur mit einem kuenftigen
+Termin auf derselben Seite zaehlt. Er laeuft in jedem Wachlauf mit — nach dem Melden, damit ein
 Fehler in der Bewertung eine echte Nachricht nicht aufhaelt, aber den Lauf
 trotzdem rot macht.
 
@@ -224,21 +241,27 @@ weiter.
 
 ### Was noch ungeprueft ist
 
-Die Adressen und Wortlaute sind recherchiert, aber **nicht gegen die echten
-Seiten gemessen**: aus dieser Entwicklungsumgebung liessen sich
-`www.feuertanz-festival.com`, `www.concertbuero-franken.de`,
-`www.eventim.de` und `www.reservix.de` nicht abrufen — die Netzfreigabe der
-Umgebung laesst sie nicht durch (HTTP 403 vom Egress-Proxy, nicht von den
-Seiten). Geprueft ist deshalb bisher:
+Die Seiten selbst sind aus dieser Entwicklungsumgebung nicht abrufbar (HTTP
+403 vom Egress-Proxy, nicht von den Seiten). Geprueft ist deshalb:
 
-- die **Bewertung** vollstaendig, gegen Seiten auf der Platte (40 Pruefungen),
-- die **Datumserkennung** gegen deutsche Schreibweisen (`12.06.2026`,
-  `12.-13.06.2026`, `12. und 13. Juni 2026`, `30. Mai bis 1. Juni 2027`,
-  ISO, dazu die Abweisung von `31.02.2027`),
-- die **Wortlaute** gegen zehn Formulierungen.
+- die **Bewertung** vollstaendig, gegen Seiten auf der Platte (68 Pruefungen),
+- die **Datumserkennung** gegen deutsche Schreibweisen (`11.+12. Juni 2027`,
+  `11.06.2027 - 12.06.2027`, `12. und 13. Juni 2027`, `25.-26.06.2027`,
+  `30. Mai bis 1. Juni 2027`, ISO, dazu die Abweisung von `31.02.2027`),
+- die **Wortlaute** gegen 15 Formulierungen.
 
-Ungeprueft ist, ob die vier Unterseiten der Veranstalterseite so heissen und
-ob die Portale von einem Runner aus antworten. Genau dafuer ist die
+Drei dieser Zeilen stammen woertlich von den echten Seiten (ueber die
+Websuche gelesen, 20.10.2026) und haben den Code veraendert — sie fielen
+zuerst durch:
+
+| Zeile | was fehlte |
+|---|---|
+| `Vorverkauf: 122,00 €   Abendkasse: tba €` | Das ist kein Satz, sondern eine Tabellenzeile. Dafuer gibt es jetzt `preisHinweisRe` — und weil dieselbe Zeile auf der Archivseite der Ausgabe 2025 steht, zaehlt sie nur, wenn die Seite auch einen Termin nennt, der noch kommt |
+| `Tickets sind bundesweit an allen CTS Eventim Vorverkaufsstellen erhaeltlich.` | 56 Zeichen zwischen "Tickets" und "erhaeltlich" — das Fenster in `kaufbarRe` war 30 Zeichen breit, jetzt 80 |
+| `11.+12. Juni 2027` | Das Plus war kein Trenner fuer Zeitspannen. Ohne es wurde daraus der 12. allein, und der erste Festivaltag fehlte in jeder Meldung |
+
+Ungeprueft bleibt, ob die vier Unterseiten der Veranstalterseite so heissen
+und ob die Portale von einem Runner aus antworten. Genau dafuer ist die
 **Quellendiagnose** da: einmal starten, Ausgabe ansehen. Falsche Adresse →
 Zeile in `ticket-config.js` unter `quellen` richtigstellen. Portal antwortet
 mit 403 → `quellenAktiv` auf `false`, die Leitquelle traegt die Wache auch

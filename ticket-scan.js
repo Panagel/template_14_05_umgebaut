@@ -160,8 +160,12 @@ async function main() {
     // auf der noch nichts steht, ist der Normalfall und kein Ausfall. Ein
     // Ausfall ist, wenn die Wache nicht hinsehen kann.
     const zeichen = b ? Math.max.apply(null, [0].concat(b.seiten.map(s => s.status === 200 ? s.zeichen : 0))) : 0;
-    const lesbar = zeichen >= CFG.minZeichen;
     const fund = !!b && (b.termine.length || b.angebote.length || b.ticketSaetze.length);
+    // Ein Befund beweist, dass die Seite lesbar war - dann zaehlt die
+    // Zeichengrenze nicht mehr. Sie ist dafuer da, eine Blockseite von einer
+    // Seite ohne Neuigkeit zu unterscheiden, und eine Blockseite hat keine
+    // Termine und keine Ticketsaetze.
+    const lesbar = zeichen >= CFG.minZeichen || fund;
     for (const h of (b ? b.hinweise : [])) log('   ? ' + h);
 
     if (!lesbar) {

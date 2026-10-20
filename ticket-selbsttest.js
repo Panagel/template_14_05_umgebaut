@@ -221,6 +221,27 @@ console.log('\n8. Ticketseite umformuliert, ohne erkennbare Kaufgelegenheit');
     JSON.stringify((von(e2, 'aenderung') || {}).gruende || []).includes('Kartenkontingente'), 'Satz fehlt');
 }
 
+// ---------------------------------------------------------------- 8b
+console.log('\n8b. Deutsche Datumsschreibweisen');
+{
+  const { datenAusText } = require('./ticket-quellen.js');
+  const proben = [
+    ['Das Festival findet am 11.+12. Juni 2027 statt.', '2027-06-11', '2027-06-12'],
+    ['11.06.2027 - 12.06.2027 - Abenberg', '2027-06-11', '2027-06-12'],
+    ['Termin: 12. und 13. Juni 2027', '2027-06-12', '2027-06-13'],
+    ['25.-26.06.2027 auf Burg Abenberg', '2027-06-25', '2027-06-26'],
+    ['Vom 30. Mai bis 1. Juni 2027', '2027-05-30', '2027-06-01'],
+    ['Beginn 2027-06-11', '2027-06-11', null],
+    ['Am 13. Juni 2027 ab 14 Uhr', '2027-06-13', null],
+    ['Der 31.02.2027 gibt es nicht', null, null]
+  ];
+  for (const [satz, von, bis] of proben) {
+    const d = datenAusText(satz)[0] || {};
+    pruefe('"' + satz.slice(0, 46) + '" -> ' + (von || 'nichts'),
+      (d.von || null) === von && (d.bis || null) === bis, JSON.stringify(d));
+  }
+}
+
 // ---------------------------------------------------------------- 9
 console.log('\n9. Wortlaute: kaufen, warten, ausverkauft auseinanderhalten');
 {
@@ -235,10 +256,20 @@ console.log('\n9. Wortlaute: kaufen, warten, ausverkauft auseinanderhalten');
     ['Tickets ab 1. Dezember ' + jahr + '.', 'start'],
     ['Das Festival ist ausverkauft.', 'aus'],
     ['Hier geht es zu den Tickets.', 'keins'],
-    ['Tickets', 'keins']
+    ['Tickets', 'keins'],
+    // Die vier Zeilen stehen so auf den echten Seiten, gemessen am
+    // 20.10.2026. Die erste ist der Grund, warum es preisHinweisRe gibt;
+    // die zweite der Grund, warum das Fenster in kaufbarRe 80 Zeichen hat;
+    // die dritte stand bei Eventim, waehrend der Veranstalter verkaufte.
+    ['Vorverkauf: 122,00 € | Abendkasse: tba €', 'kauf'],
+    ['Tickets sind bundesweit an allen CTS Eventim Vorverkaufsstellen erhaeltlich.', 'kauf'],
+    ['Aktuell scheinen keine Termine im Vorverkauf zu sein.', 'keins'],
+    ['Vorverkauf: 3,00 EUR', 'keins'],
+    ['Programmheft: 3,00 EUR', 'keins']
   ];
+  const { preisHinweis } = require('./ticket-quellen.js');
   for (const [satz, soll] of proben) {
-    const kauf = CFG.kaufbarRe.test(satz) || CFG.vvkLaeuftRe.test(satz);
+    const kauf = CFG.kaufbarRe.test(satz) || CFG.vvkLaeuftRe.test(satz) || !!preisHinweis(satz);
     const start = CFG.vvkStartRe.test(satz);
     const aus = CFG.ausverkauftRe.test(satz);
     // "Vorverkauf ist gestartet" trifft beide Muster - entschieden wird im
@@ -323,6 +354,43 @@ console.log('\n12. Karten zuerst, Termin spaeter - klingelt nur einmal');
     JSON.stringify(e2.stand));
   pruefe('und die Karten gelten weiter als zu haben',
     e2.stand[0] && e2.stand[0].karten === 'zu haben', JSON.stringify(e2.stand));
+}
+
+// --------------------------------------------------------------- 13
+console.log('\n13. Preiszeile zaehlt nur mit einem Termin, der noch kommt');
+{
+  // So sieht die Detailseite des Veranstalters aus: eine Seite je Ausgabe,
+  // Termin und Preiszeile. Die Archivseite der vergangenen Ausgabe traegt
+  // dieselbe Zeile - und darf keine Kaufmeldung ausloesen.
+  const detail = (datum, preis) => seite('Concertbuero',
+    '<h1>FEUERTANZ FESTIVAL</h1><p>' + datum + ' - Abenberg - Burg Abenberg</p>' +
+    '<p>Vorverkauf: ' + preis + ' | Abendkasse: tba €</p><p>Stehplatzveranstaltung.</p>');
+
+  const archiv = buehne('preiszeile-archiv', {
+    [O]: seite('Feuertanz', '<p>Feuertanz Festival auf Burg Abenberg.</p>'),
+    [T]: seite('Tickets', '<h1>Tickets</h1><p>Informationen folgen.</p>'),
+    ['https://www.concertbuero-franken.de/']: seite('CBF',
+      '<p>Konzerte in Franken.</p><a href="/konzert-details/feuertanz-festival.html">Feuertanz Festival</a>'),
+    ['https://www.concertbuero-franken.de/konzert-details/feuertanz-festival.html']:
+      detail('13.06.' + (jahr - 1) + ' - 14.06.' + (jahr - 1), '92,00 €')
+  });
+  const e = lauf(archiv);
+  pruefe('Preiszeile der vergangenen Ausgabe meldet nichts', !hat(e, 'kaufbar'), typen(e).join(','));
+  pruefe('und der Lauf sagt, dass er sie uebergangen hat',
+    /Preiszeile ohne kuenftigen Termin/.test(e.log), 'kein Hinweis im Log');
+
+  const aktuell = buehne('preiszeile-aktuell', {
+    [O]: seite('Feuertanz', '<p>Feuertanz Festival auf Burg Abenberg.</p>'),
+    [T]: seite('Tickets', '<h1>Tickets</h1><p>Informationen folgen.</p>'),
+    ['https://www.concertbuero-franken.de/']: seite('CBF',
+      '<p>Konzerte in Franken.</p><a href="/konzert-details/feuertanz-festival-' + naechstes + '.html">Feuertanz Festival ' + naechstes + '</a>'),
+    ['https://www.concertbuero-franken.de/konzert-details/feuertanz-festival-' + naechstes + '.html']:
+      detail('11.06.' + naechstes + ' - 12.06.' + naechstes, '122,00 €')
+  });
+  const e2 = lauf(aktuell);
+  pruefe('Preiszeile der kommenden Ausgabe meldet Karten', hat(e2, 'kaufbar'), typen(e2).join(','));
+  pruefe('Termin wird mitgemeldet', hat(e2, 'termin'), typen(e2).join(','));
+  pruefe('Termin richtig gelesen', /11\.06\./.test((von(e2, 'termin') || {}).titel || ''), (von(e2, 'termin') || {}).titel);
 }
 
 console.log('\n' + (fehler ? 'FEHLER: ' + fehler + ' von ' + geprueft + ' Pruefungen nicht erfuellt'

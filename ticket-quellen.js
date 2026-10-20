@@ -92,11 +92,13 @@ const DATUM_MUSTER = [
   // 30. Mai - 1. Juni 2026
   { re: new RegExp('(\\d{1,2})\\.?\\s*(' + MON_RE + ')\\s*(?:bis|[-–—])\\s*(\\d{1,2})\\.?\\s*(' + MON_RE + ')\\s*(20\\d\\d)', 'gi'),
     bau: m => ({ von: tag(+m[5], mon(m[2]), +m[1]), bis: tag(+m[5], mon(m[4]), +m[3]) }) },
-  // 12.-13.06.2026
-  { re: /(\d{1,2})\.\s*(?:bis|und|&|[-–—/])\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(20\d\d)/g,
+  // 12.-13.06.2026, auch "12.+13.06.2026"
+  { re: /(\d{1,2})\.\s*(?:bis|und|&|\+|[-–—/])\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(20\d\d)/g,
     bau: m => ({ von: tag(+m[4], +m[3], +m[1]), bis: tag(+m[4], +m[3], +m[2]) }) },
-  // 12. und 13. Juni 2026
-  { re: new RegExp('(\\d{1,2})\\.?\\s*(?:bis|und|&|[-–—/])\\s*(\\d{1,2})\\.?\\s*(' + MON_RE + ')\\s*(20\\d\\d)', 'gi'),
+  // 12. und 13. Juni 2026 - und "11.+12. Juni 2027", so schreibt es die
+  // Seite des Veranstalters. Ohne das Plus wird daraus der 12. allein, und
+  // der erste Festivaltag fehlt in jeder Meldung.
+  { re: new RegExp('(\\d{1,2})\\.?\\s*(?:bis|und|&|\\+|[-–—/])\\s*(\\d{1,2})\\.?\\s*(' + MON_RE + ')\\s*(20\\d\\d)', 'gi'),
     bau: m => ({ von: tag(+m[4], mon(m[3]), +m[1]), bis: tag(+m[4], mon(m[3]), +m[2]) }) },
   // 13.06.2026
   { re: /(\d{1,2})\.\s*(\d{1,2})\.\s*(20\d\d)/g, bau: m => ({ von: tag(+m[3], +m[2], +m[1]) }) },
@@ -259,8 +261,20 @@ function leererBefund(key, qcfg) {
 }
 
 // Eine Seite auswerten und in den Befund einhaengen.
+// Eine Preiszeile zaehlt nur mit plausiblem Betrag. "Vorverkauf: 3,00 EUR"
+// ist ein Programmheft, "Vorverkauf: 1.290,00 EUR" ein Reisepaket.
+function preisHinweis(s) {
+  const m = String(s).match(CFG.preisHinweisRe);
+  if (!m) return null;
+  const c = cents(m[0]);
+  return (c !== null && c >= CFG.preisMin && c <= CFG.preisMax) ? m[0] : null;
+}
+
 function seiteLesen(befund, r, qcfg) {
   const text = textOf(r.body);
+  // Stand der Termine beim Betreten: daran erkennt die Seite am Ende, ob
+  // sie selbst einen Termin in der Zukunft nennt.
+  const terminStand = befund.termine.length;
   befund.seiten.push({ url: r.url, status: r.status, bytes: (r.body || '').length, zeichen: text.length });
   if (!r.body) return;
 
@@ -330,6 +344,33 @@ function seiteLesen(befund, r, qcfg) {
     if (!seiteMeint && !CFG.festivalRe.test(fenster)) continue;
     befund.termine.push({ von: d.von, bis: d.bis, url: r.url, herkunft: 'text', satz: fenster.slice(0, 220) });
   }
+
+  // --- Preiszeilen, ebenfalls ueber den ganzen Seitentext
+  // Aus demselben Grund wie bei den Terminen: "Vorverkauf: 122,00 EUR |
+  // Abendkasse: tba" zerfaellt an jeder Satztrennung - hinter "Vorverkauf"
+  // steht ein Doppelpunkt, zwischen den beiden Angaben ein Strich. Satzweise
+  // gelesen bleibt von der Zeile ein nacktes "Vorverkauf:" uebrig.
+  //
+  // Zwei Bedingungen, beide gegen denselben Irrtum: die Seite muss einen
+  // Termin nennen, der noch kommt, und im Umfeld der Zeile darf kein
+  // "ausverkauft" stehen. Auf der Archivseite der vergangenen Ausgabe steht
+  // dieselbe Zeile mit dem Preis von damals.
+  const nenntZukunft = befund.termine.length > terminStand;
+  const preisRe = new RegExp(CFG.preisHinweisRe.source, 'gi');
+  let pm, genommen = 0;
+  while ((pm = preisRe.exec(text)) && genommen < 3) {
+    const c = cents(pm[0]);
+    if (c === null || c < CFG.preisMin || c > CFG.preisMax) continue;
+    const fenster = text.slice(Math.max(0, pm.index - 120), pm.index + 160).trim();
+    if (CFG.ausverkauftRe.test(fenster)) continue;
+    if (!seiteMeint && !CFG.festivalRe.test(fenster)) continue;
+    if (!nenntZukunft) {
+      befund.hinweise.push('Preiszeile ohne kuenftigen Termin auf derselben Seite, uebergangen: "' + pm[0].trim() + '"');
+      continue;
+    }
+    genommen++;
+    befund.kaufSaetze.push({ satz: fenster.slice(0, 180), url: r.url });
+  }
 }
 
 // ------------------------------------------------------------- Adapter
@@ -377,6 +418,6 @@ async function leseQuelle(key, log) {
 }
 
 module.exports = {
-  holen, saetze, datenAusText, eventsAusSeite, angeboteAus, verfuegbarAus,
+  holen, saetze, datenAusText, eventsAusSeite, angeboteAus, verfuegbarAus, preisHinweis,
   istFeuertanz, istVoraus, leseQuelle, seiteLesen, leererBefund, absolut, heute, tag
 };
