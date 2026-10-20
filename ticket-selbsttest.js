@@ -265,10 +265,22 @@ console.log('\n9. Wortlaute: kaufen, warten, ausverkauft auseinanderhalten');
     ['Tickets sind bundesweit an allen CTS Eventim Vorverkaufsstellen erhaeltlich.', 'kauf'],
     ['Aktuell scheinen keine Termine im Vorverkauf zu sein.', 'keins'],
     ['Vorverkauf: 3,00 EUR', 'keins'],
-    ['Programmheft: 3,00 EUR', 'keins']
+    ['Programmheft: 3,00 EUR', 'keins'],
+    // Und diese vier standen am 20.10.2026 woertlich auf den echten Seiten.
+    // Die ersten beiden haetten Fehlalarm ausgeloest: ein Rueckblick auf
+    // vergangene Jahre und das "AUSVERKAUFT" eines anderen Konzerts.
+    ['Tickets und weitere Informationen I n den letzten Jahren ging das Feuertanz Festival regelmaessig und schnell "Sold Out".', 'keins'],
+    ['Hirsch AUSVERKAUFT 25.10.2026 20:00-23:59 EISI GULP Nuernberg', 'aus'],
+    ['Ticket kaufen Fuer Vorabinfos, neue Acts & mehr:', 'keins'],
+    ['Euer Eric Jetzt Ticket sichern!', 'kauf']
   ];
   const { preisHinweis } = require('./ticket-quellen.js');
   for (const [satz, soll] of proben) {
+    // Dieselbe Reihenfolge wie im Lauf: der Rueckblick zuerst.
+    if (CFG.rueckblickRe.test(satz)) {
+      pruefe('"' + satz.slice(0, 52) + '" -> keins (Rueckblick)', soll === 'keins', 'soll ' + soll);
+      continue;
+    }
     const kauf = CFG.kaufbarRe.test(satz) || CFG.vvkLaeuftRe.test(satz) || !!preisHinweis(satz);
     const start = CFG.vvkStartRe.test(satz);
     const aus = CFG.ausverkauftRe.test(satz);
@@ -391,6 +403,49 @@ console.log('\n13. Preiszeile zaehlt nur mit einem Termin, der noch kommt');
   pruefe('Preiszeile der kommenden Ausgabe meldet Karten', hat(e2, 'kaufbar'), typen(e2).join(','));
   pruefe('Termin wird mitgemeldet', hat(e2, 'termin'), typen(e2).join(','));
   pruefe('Termin richtig gelesen', /11\.06\./.test((von(e2, 'termin') || {}).titel || ''), (von(e2, 'termin') || {}).titel);
+}
+
+// --------------------------------------------------------------- 14
+console.log('\n14. Fremde Konzerte auf der Terminliste des Veranstalters');
+{
+  // Nachgebaut aus dem, was am 20.10.2026 wirklich auf
+  // concertbuero-franken.de stand: eine Liste, in der neben dem Festival
+  // andere Konzerte stehen - mit deren "AUSVERKAUFT".
+  const d = buehne('fremde-konzerte', {
+    [O]: seite('Feuertanz', '<p>Feuertanz Festival: 11.+12. Juni ' + naechstes + ', Burg Abenberg.</p>'),
+    [T]: seite('Tickets', '<h1>Tickets</h1><p>Zum Ticket-Shop.</p>'),
+    ['https://www.concertbuero-franken.de/']: seite('CBF',
+      '<p>Hirsch AUSVERKAUFT 25.10.' + jahr + ' 20:00 EISI GULP Nuernberg</p>' +
+      '<p>Z-Bau AUSVERKAUFT 30.10.' + jahr + ' 20:00 THE NEW ROSES Nuernberg</p>' +
+      '<a href="/konzert-details/feuertanz-festival-' + naechstes + '.html">FEUERTANZ FESTIVAL ' + naechstes + '</a>'),
+    ['https://www.concertbuero-franken.de/konzert-details/feuertanz-festival-' + naechstes + '.html']: seite('CBF',
+      '<h1>FEUERTANZ FESTIVAL ' + naechstes + '</h1><p>11.06.' + naechstes + ' - 12.06.' + naechstes + ' - Burg Abenberg</p>' +
+      '<p>Vorverkauf: 122,00 € | Abendkasse: tba €</p>')
+  });
+  const e = lauf(d);
+  pruefe('kein "ausverkauft" wegen fremder Konzerte', !hat(e, 'ausverkauft'), typen(e).join(','));
+  pruefe('keine Ausgabe ' + jahr + ' erfunden',
+    !e.stand.some(s => s.ausgabe === String(jahr)), JSON.stringify(e.stand));
+  pruefe('die Karten der eigenen Ausgabe werden gemeldet', hat(e, 'kaufbar'), typen(e).join(','));
+}
+
+// --------------------------------------------------------------- 15
+console.log('\n15. Rueckblick der Veranstalterseite macht kein "ausverkauft"');
+{
+  // Der Satz steht so auf festival.html, gemessen am 20.10.2026 - waehrend
+  // der Vorverkauf lief.
+  const d = buehne('rueckblick', {
+    [O]: seite('Feuertanz', '<p>Feuertanz Festival: 11.+12. Juni ' + naechstes + ', Burg Abenberg.</p>' +
+      '<p>Euer Eric Jetzt Ticket sichern!</p>'),
+    [T]: seite('Tickets', '<h1>Tickets</h1><p>Tickets und weitere Informationen. ' +
+      'I n den letzten Jahren ging das Feuertanz Festival regelmaessig und schnell "Sold Out". ' +
+      'Abonniere unseren Newsletter.</p>')
+  });
+  const e = lauf(d);
+  pruefe('kein "ausverkauft"', !hat(e, 'ausverkauft'), typen(e).join(','));
+  pruefe('und der Kaufhinweis bleibt wirksam', hat(e, 'kaufbar'), typen(e).join(','));
+  pruefe('der Lauf sagt, dass er den Rueckblick erkannt hat',
+    /Rueckblick, nicht als Lage gewertet/.test(e.log), 'kein Hinweis im Log');
 }
 
 console.log('\n' + (fehler ? 'FEHLER: ' + fehler + ' von ' + geprueft + ' Pruefungen nicht erfuellt'

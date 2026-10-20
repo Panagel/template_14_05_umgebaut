@@ -278,11 +278,20 @@ function seiteLesen(befund, r, qcfg) {
   befund.seiten.push({ url: r.url, status: r.status, bytes: (r.body || '').length, zeichen: text.length });
   if (!r.body) return;
 
-  const seiteMeint = istFeuertanz(text.slice(0, 4000), r.url) || !!qcfg.leitquelle;
+  // Handelt diese Seite *nur* vom Festival? Nur dann darf ein Satz ohne
+  // Festivalnamen als Aussage ueber das Festival gelten. Das trifft auf die
+  // Seite des Veranstalters zu und auf eine Detailseite, die den Namen in
+  // der Adresse traegt - nicht auf eine Terminliste.
+  //
+  // Gemessen am 20.10.2026: die Startseite des Concertbuero fuehrt neben dem
+  // Festival ein Dutzend andere Konzerte, darunter "Hirsch AUSVERKAUFT
+  // 25.10.2026 EISI GULP". Mit der alten, weiteren Regel wurde daraus eine
+  // Meldung, das Feuertanz Festival sei ausverkauft.
+  const nurDavon = !!qcfg.leitquelle || CFG.festivalRe.test(String(r.url));
 
   // --- schema.org
   for (const ev of eventsAusSeite(r.body, r.url)) {
-    if (!istFeuertanz(ev.name, ev.ort, ev.url) && !(qcfg.leitquelle && seiteMeint)) continue;
+    if (!istFeuertanz(ev.name, ev.ort, ev.url) && !nurDavon) continue;
     if (ev.abgesagt) { befund.hinweise.push('Als abgesagt ausgezeichnet: ' + (ev.name || ev.von)); continue; }
     if (ev.von && istVoraus(ev.von)) {
       befund.termine.push({
@@ -308,13 +317,23 @@ function seiteLesen(befund, r, qcfg) {
   const vvkDaten = new Set();
   for (const s of saetze(text)) {
     if (!CFG.ticketWortRe.test(s)) continue;
-    if (!seiteMeint && !CFG.festivalRe.test(s)) continue;
+    if (!nurDavon && !CFG.festivalRe.test(s)) continue;
     befund.ticketSaetze.push(s);
 
-    const aus = CFG.ausverkauftRe.test(s);
-    if (aus) befund.ausverkauftSaetze.push({ satz: s, url: r.url });
-
     const daten = datenAusText(s).map(x => x.von).filter(Boolean).sort();
+
+    // Ein Satz ueber vergangene Jahre ist keine Aussage ueber jetzt - weder
+    // "ausverkauft" noch "zu haben".
+    if (CFG.rueckblickRe.test(s)) {
+      if (CFG.ausverkauftRe.test(s) || CFG.kaufbarRe.test(s) || CFG.vvkLaeuftRe.test(s)) {
+        befund.hinweise.push('Rueckblick, nicht als Lage gewertet: "' + s.slice(0, 90) + '"');
+      }
+      continue;
+    }
+
+    const aus = CFG.ausverkauftRe.test(s);
+    if (aus) befund.ausverkauftSaetze.push({ satz: s, url: r.url, daten: daten, eigen: nurDavon });
+
     const kommtNoch = daten.filter(x => x > heute());
     // Ankuendigung: Startwort plus Datum. Liegt das Datum noch vor uns, ist
     // das eine Vorwarnung und ausdruecklich kein Kaufhinweis. Liegt es
@@ -328,7 +347,7 @@ function seiteLesen(befund, r, qcfg) {
     // Ein Kaufhinweis zaehlt nur, wenn im selben Satz kein "ausverkauft"
     // steht und der Satz nicht bloss einen Start ankuendigt, der noch kommt.
     if (!aus && kommtNoch.length === 0 && (CFG.kaufbarRe.test(s) || CFG.vvkLaeuftRe.test(s))) {
-      befund.kaufSaetze.push({ satz: s, url: r.url });
+      befund.kaufSaetze.push({ satz: s, url: r.url, daten: daten, eigen: nurDavon });
     }
   }
 
@@ -338,11 +357,22 @@ function seiteLesen(befund, r, qcfg) {
   // die Fundstelle - das reicht, um zu gewichten und in der Meldung zu
   // zitieren. Ein angekuendigter Vorverkaufsstart ist hier ausgenommen: das
   // ist ein Datum, aber nicht der Festivaltermin.
-  for (const d of datenAusText(text)) {
-    if (!istVoraus(d.von) || vvkDaten.has(d.von)) continue;
-    const fenster = text.slice(Math.max(0, d.pos - 140), d.pos + 140).trim();
-    if (!seiteMeint && !CFG.festivalRe.test(fenster)) continue;
-    befund.termine.push({ von: d.von, bis: d.bis, url: r.url, herkunft: 'text', satz: fenster.slice(0, 220) });
+  //
+  // Nur auf Seiten, die ausschliesslich vom Festival handeln. Auf einer
+  // Terminliste ist ein Datum nicht zuordenbar - zwischen dem Datum und dem
+  // Namen des Festivals koennen drei andere Konzerte stehen, und ein Fenster
+  // um die Fundstelle raet dann bloss. Gemessen am 20.10.2026 fuehrte die
+  // Startseite des Concertbuero acht fremde Termine. Auf Listenseiten zaehlt
+  // deshalb nur, was als schema.org-Event mit Namen ausgezeichnet ist - und
+  // die Detailseite, der der Adapter ueber den Link ohnehin folgt.
+  if (nurDavon) {
+    for (const d of datenAusText(text)) {
+      if (!istVoraus(d.von) || vvkDaten.has(d.von)) continue;
+      const fenster = text.slice(Math.max(0, d.pos - 140), d.pos + 140).trim();
+      befund.termine.push({ von: d.von, bis: d.bis, url: r.url, herkunft: 'text', satz: fenster.slice(0, 220) });
+    }
+  } else if (datenAusText(text).some(d => istVoraus(d.von))) {
+    befund.hinweise.push('Listenseite: Termine im Text nicht zugeordnet, nur Links und Datenbloecke zaehlen (' + r.url + ')');
   }
 
   // --- Preiszeilen, ebenfalls ueber den ganzen Seitentext
@@ -355,21 +385,20 @@ function seiteLesen(befund, r, qcfg) {
   // Termin nennen, der noch kommt, und im Umfeld der Zeile darf kein
   // "ausverkauft" stehen. Auf der Archivseite der vergangenen Ausgabe steht
   // dieselbe Zeile mit dem Preis von damals.
-  const nenntZukunft = befund.termine.length > terminStand;
+  const nenntZukunft = nurDavon && befund.termine.length > terminStand;
   const preisRe = new RegExp(CFG.preisHinweisRe.source, 'gi');
   let pm, genommen = 0;
   while ((pm = preisRe.exec(text)) && genommen < 3) {
     const c = cents(pm[0]);
     if (c === null || c < CFG.preisMin || c > CFG.preisMax) continue;
     const fenster = text.slice(Math.max(0, pm.index - 120), pm.index + 160).trim();
-    if (CFG.ausverkauftRe.test(fenster)) continue;
-    if (!seiteMeint && !CFG.festivalRe.test(fenster)) continue;
+    if (CFG.ausverkauftRe.test(fenster) || CFG.rueckblickRe.test(fenster)) continue;
     if (!nenntZukunft) {
       befund.hinweise.push('Preiszeile ohne kuenftigen Termin auf derselben Seite, uebergangen: "' + pm[0].trim() + '"');
       continue;
     }
     genommen++;
-    befund.kaufSaetze.push({ satz: fenster.slice(0, 180), url: r.url });
+    befund.kaufSaetze.push({ satz: fenster.slice(0, 180), url: r.url, daten: [], eigen: nurDavon });
   }
 }
 

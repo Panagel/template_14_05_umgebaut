@@ -63,16 +63,33 @@ function jahreOffen(state) {
 // kommt, gilt die. Sonst die naechste bekannte Ausgabe. Weiss der Watcher
 // noch keinen Termin, landet der Befund unter "offen" - genau der Fall im
 // Herbst, wenn Karten vor dem Termin verkauft werden.
-function jahrZu(satz, state) {
+function jahrZu(satz, state, eigen) {
   const jahre = String(satz || '').match(/\b20\d\d\b/g) || [];
   for (const j of jahre.map(Number).sort()) {
     if (j < JAHR || j > JAHR + CFG.jahreVoraus) continue;
     const a = state.ausgaben[String(j)];
     if (a && !istOffen(a)) continue;      // Ausgabe ist vorbei: Altlast
+    // Eine Jahreszahl macht noch keine Ausgabe. Von einer Seite, die nur
+    // vom Festival handelt, darf sie eine anlegen - "Tickets fuer 2028"
+    // steht dort ueber das Festival. Von einer Terminliste nicht: dort ist
+    // "AUSVERKAUFT 25.10.2026" das Konzert von jemand anderem.
+    if (!a || !a.datum) { if (!eigen) continue; }
     return String(j);
   }
   const offen = jahreOffen(state);
   return offen.length ? offen[0] : 'offen';
+}
+
+// Nennt ein Satz ein Datum, muss es der Termin der Ausgabe sein, der er
+// zugeordnet wird. Sonst spricht er von etwas anderem - und das ist nicht
+// ausgedacht: auf der Terminliste des Veranstalters stand am 20.10.2026
+// "Hirsch AUSVERKAUFT 25.10.2026 EISI GULP" neben dem Festival.
+function passtZumTermin(state, jahr, daten) {
+  if (!daten || !daten.length) return true;
+  const a = state.ausgaben[jahr];
+  if (!a || !a.datum) return true;
+  const tage = [a.datum, a.bis].filter(Boolean);
+  return daten.some(d => tage.indexOf(d) > -1);
 }
 
 function ausgabe(state, jahr) {
@@ -246,11 +263,25 @@ async function main() {
   const bucket = j => (je[j] = je[j] || { kauf: [], aus: [], vvk: [], angebote: [] });
 
   for (const b of befunde) {
-    for (const k of b.kaufSaetze) bucket(jahrZu(k.satz, state)).kauf.push({ quelle: b.name, leitquelle: b.leitquelle, satz: k.satz, url: k.url });
-    for (const s of b.ausverkauftSaetze) bucket(jahrZu(s.satz, state)).aus.push({ quelle: b.name, leitquelle: b.leitquelle, satz: s.satz, url: s.url });
-    for (const v of b.vvkSaetze) bucket(jahrZu(v.satz + ' ' + (v.start || ''), state)).vvk.push({ quelle: b.name, satz: v.satz, url: v.url, start: v.start });
+    for (const k of b.kaufSaetze) {
+      const j = jahrZu(k.satz, state, k.eigen);
+      if (!passtZumTermin(state, j, k.daten)) {
+        log('   ? Kaufhinweis nennt einen fremden Termin, uebergangen: "' + k.satz.slice(0, 70) + '"');
+        continue;
+      }
+      bucket(j).kauf.push({ quelle: b.name, leitquelle: b.leitquelle, satz: k.satz, url: k.url });
+    }
+    for (const s of b.ausverkauftSaetze) {
+      const j = jahrZu(s.satz, state, s.eigen);
+      if (!passtZumTermin(state, j, s.daten)) {
+        log('   ? "ausverkauft" nennt einen fremden Termin, uebergangen: "' + s.satz.slice(0, 70) + '"');
+        continue;
+      }
+      bucket(j).aus.push({ quelle: b.name, leitquelle: b.leitquelle, satz: s.satz, url: s.url });
+    }
+    for (const v of b.vvkSaetze) bucket(jahrZu(v.satz + ' ' + (v.start || ''), state, true)).vvk.push({ quelle: b.name, satz: v.satz, url: v.url, start: v.start });
     for (const a of b.angebote) {
-      const j = a.termin ? a.termin.slice(0, 4) : jahrZu([a.eventName, a.name].filter(Boolean).join(' '), state);
+      const j = a.termin ? a.termin.slice(0, 4) : jahrZu([a.eventName, a.name].filter(Boolean).join(' '), state, true);
       // Ein Angebot zu einem Termin, der vorbei ist, ist ein Archivfund.
       if (a.termin && !istVoraus(a.termin)) continue;
       bucket(j).angebote.push(Object.assign({ quelle: b.name }, a));
