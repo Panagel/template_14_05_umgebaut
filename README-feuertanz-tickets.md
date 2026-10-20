@@ -2,7 +2,7 @@
 
 Meldet, **sobald es Karten fuer das Feuertanz Festival auf Burg Abenberg
 gibt** — und vorher, wann das Festival stattfindet und wann der Vorverkauf
-startet. Kein Newsletter-Ersatz: die Wache schaut zweimal pro Stunde auf die
+startet. Laeuft seit dem 20.10.2026. Kein Newsletter-Ersatz: die Wache schaut zweimal pro Stunde auf die
 Seite des Veranstalters und auf die Ticketportale und schickt genau dann eine
 Nachricht, wenn sich etwas geaendert hat, das mit Kartenkauf zu tun hat.
 
@@ -159,12 +159,17 @@ eigenem Datenverzeichnis: `data/`, `gebraucht/data/`, `data-feuertanz/`.
 **2. Secrets** (*Settings → Secrets and variables → Actions*) — dieselben wie
 beim Preiswatcher, nichts Neues, wenn der schon laeuft:
 
-| Secret | Pflicht | Zweck |
-|---|---|---|
-| `NTFY_TOPIC` | ja | ntfy-Topic, frei waehlbar, aber **nicht erratbar machen** — jeder mit dem Namen liest mit |
-| `NTFY_TOKEN` | nein | nur fuer geschuetzte ntfy-Topics |
-| `TELEGRAM_TOKEN` | nein | falls du zusaetzlich Telegram willst |
-| `TELEGRAM_CHAT_ID` | nein | Ziel-Chat |
+Eines der beiden Paare genuegt. In diesem Repo ist am 20.10.2026 **Telegram
+gesetzt und ntfy leer** - die Meldungen des ersten Laufs gingen per Telegram
+raus (HTTP 200). Wer sie zusaetzlich aufs ntfy-Handy will, setzt
+`NTFY_TOPIC`; wer nur ntfy will, kann Telegram leer lassen.
+
+| Secret | Zweck |
+|---|---|
+| `NTFY_TOPIC` | ntfy-Topic, frei waehlbar, aber **nicht erratbar machen** — jeder mit dem Namen liest mit |
+| `NTFY_TOKEN` | nur fuer geschuetzte ntfy-Topics |
+| `TELEGRAM_TOKEN` | Bot-Token |
+| `TELEGRAM_CHAT_ID` | Ziel-Chat |
 
 **3. Probelauf.** Unter *Actions* den Workflow **Feuertanz-Ticketwache**
 einmal von Hand starten, mit `testpush = true`. Dann kommt sofort eine
