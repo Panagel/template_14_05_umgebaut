@@ -52,7 +52,7 @@ module.exports = {
     // Fenster nicht reichen, dafuer sorgt [^.!?].
     '|(?:tickets?|karten)[^.!?]{0,80}(?:sind\\s+)?(?:jetzt\\s+)?(?:erh[aä]ltlich|verf[uü]gbar|im\\s+vorverkauf|zu\\s+haben)',
     '|jetzt\\s+(?:tickets?|karten)\\s+(?:sichern|kaufen|bestellen|holen)',
-    '|(?:tickets?|karten)\\s+(?:jetzt\\s+)?(?:sichern|kaufen|bestellen)',
+    '|(?:tickets?|karten)\\s+jetzt\\s+(?:sichern|kaufen|bestellen)',
     '|in\\s+den\\s+warenkorb|zur\\s+kasse|tickets?\\s+w[aä]hlen',
     '|\\bpresale\\s+(?:is\\s+)?(?:live|open|started)|tickets?\\s+on\\s+sale'
   ].join(''), 'i'),
@@ -70,6 +70,24 @@ module.exports = {
     '(?:vorverkauf|vvk|tickets?|karten|eintritt|festivalticket)s?\\s*(?:preis)?\\s*[:=]?\\s*(?:ab\\s+)?',
     '(?:€|eur|euro)?\\s*\\d{1,3}(?:[.,]\\d{2})?\\s*(?:€|eur|euro)',
     '|(?:€|eur|euro)\\s*\\d{1,3}(?:[.,]\\d{2})?\\s*(?:im\\s+)?(?:vorverkauf|vvk)'
+  ].join(''), 'i'),
+
+  // Rueckblick statt Lage: ein Satz ueber vergangene Jahre sagt nichts
+  // darueber, wie es jetzt steht - in keine der beiden Richtungen. Gemessen
+  // am 20.10.2026 stand auf festival.html: "In den letzten Jahren ging das
+  // Feuertanz Festival regelmaessig und schnell Sold Out." Ohne diese
+  // Gegenprobe haette die Wache daraus "2027 ist ausverkauft" gemacht,
+  // waehrend der Vorverkauf lief - und sich damit selbst den Kaufhinweis
+  // abgeschaltet.
+  //
+  // Die Marker kommen bewusst ohne das erste Wort des Satzes aus: die Seite
+  // setzt einen Initialbuchstaben, aus "In den letzten Jahren" wird im Text
+  // "I n den letzten Jahren".
+  rueckblickRe: new RegExp([
+    '(?:letzten|vergangenen|vorherigen|fr[uü]heren)\\s+jahren',
+    '|jedes\\s+jahr|jahr\\s+f[uü]r\\s+jahr|regelm[aä]ssig|regelmäßig',
+    '|immer\\s+wieder|in\\s+der\\s+vergangenheit|bisher\\s+(?:immer|stets)',
+    '|r[uü]ckblick|history|war\\s+(?:bereits\\s+)?ausverkauft|waren\\s+ausverkauft'
   ].join(''), 'i'),
 
   // Gegenprobe. Steht das im selben Satz, zaehlt der Satz nicht als
@@ -101,7 +119,11 @@ module.exports = {
 
   // Alles, was ueberhaupt mit Karten zu tun hat. Dient nur dazu, die
   // Saetze auszuwaehlen, deren Aenderung beobachtet wird.
-  ticketWortRe: /tickets?|karten|vvk|vorverkauf|eintritt|presale|ausverkauft/i,
+  // "sold out" gehoert mit hinein, auch wenn im Satz kein Wort von Karten
+  // steht: auf festival.html stand "ging das Feuertanz Festival regelmaessig
+  // und schnell Sold Out" - ohne diesen Eintrag sieht die Wache den Satz gar
+  // nicht und kann ihn auch nicht als Rueckblick verwerfen.
+  ticketWortRe: /tickets?|karten|vvk|vorverkauf|eintritt|presale|ausverkauft|sold\s?out|vergriffen/i,
 
   // Ist ein angekuendigter Vorverkaufsstart verstrichen, gilt der Satz
   // selbst als Kaufhinweis - so viele Tage lang. Danach ist er

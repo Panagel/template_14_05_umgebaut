@@ -108,22 +108,37 @@ function sitemapZeilen(body) {
       }
 
       // Wortlaute - der eigentliche Grund fuer diesen Lauf
-      const treffer = { kaufen: [], start: [], ausverkauft: [] };
+      const treffer = { kaufen: [], start: [], ausverkauft: [], rueckblick: [] };
       for (const s of saetze(text)) {
         if (!CFG.ticketWortRe.test(s)) continue;
+        if (CFG.rueckblickRe.test(s)) { treffer.rueckblick.push(s); continue; }
         if (CFG.ausverkauftRe.test(s)) treffer.ausverkauft.push(s);
         else if (CFG.vvkStartRe.test(s)) treffer.start.push(s);
         else if (CFG.kaufbarRe.test(s) || CFG.vvkLaeuftRe.test(s)) treffer.kaufen.push(s);
       }
-      for (const art of ['kaufen', 'start', 'ausverkauft']) {
+      for (const art of ['kaufen', 'start', 'ausverkauft', 'rueckblick']) {
         for (const s of treffer[art].slice(0, 2)) console.log('      [' + art + '] "' + kurz(s, 150) + '"');
+      }
+
+      // Die Preiszeile wird im Lauf nicht satzweise gelesen, sondern im
+      // ganzen Seitentext - hier also auch, sonst zeigt die Diagnose die
+      // eine Regel nicht, auf die es bei dieser Seite ankommt.
+      const preisRe = new RegExp(CFG.preisHinweisRe.source, 'gi');
+      let pm, gezeigt = 0;
+      while ((pm = preisRe.exec(text)) && gezeigt < 3) {
+        const c = require('./lib.js').cents(pm[0]);
+        const drin = c !== null && c >= CFG.preisMin && c <= CFG.preisMax;
+        gezeigt++;
+        console.log('      [preis ] "' + kurz(pm[0].trim(), 60) + '"' +
+                    (drin ? '' : '  (ausserhalb der Preisspanne, zaehlt nicht)'));
       }
 
       // Und die Saetze, in denen "Ticket" vorkommt, ohne dass ein Muster
       // griff. Genau hier stehen die Formulierungen, die noch fehlen.
       const ungedeutet = saetze(text)
         .filter(s => /ticket|karte|vorverkauf|vvk/i.test(s))
-        .filter(s => !treffer.kaufen.includes(s) && !treffer.start.includes(s) && !treffer.ausverkauft.includes(s))
+        .filter(s => !treffer.kaufen.includes(s) && !treffer.start.includes(s) &&
+                     !treffer.ausverkauft.includes(s) && !treffer.rueckblick.includes(s))
         .slice(0, 4);
       for (const s of ungedeutet) console.log('      [offen ] "' + kurz(s, 150) + '"');
 
