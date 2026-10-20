@@ -5,7 +5,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const MELD = path.join(__dirname, 'data', 'meldungen.json');
+// Welche Meldungsdatei gepusht wird, sagt das erste Argument - so schicken
+// mehrere Wachen im selben Repo ihre Meldungen ueber denselben Weg:
+//   node notify.js                            (Preiswatcher)
+//   node notify.js data-feuertanz/meldungen.json
+// Mit --trocken wird nichts gesendet, sondern gezeigt, was rausgehen wuerde.
+const args = process.argv.slice(2);
+const TROCKEN = args.some(a => a === '--trocken' || a === '--dry');
+const ZIEL = args.find(a => !a.startsWith('-'));
+const MELD = ZIEL ? path.resolve(ZIEL) : path.join(__dirname, 'data', 'meldungen.json');
 
 const KOPF = {
   // Der Tiefstpreis ueber alle Shops ist die einzige Meldung mit "urgent":
@@ -16,23 +24,44 @@ const KOPF = {
   preis:      { prio: 'high',    tags: 'chart_with_downwards_trend,money_with_wings' },
   verfuegbar: { prio: 'default', tags: 'package' },
   neu:        { prio: 'default', tags: 'new' },
-  ausfall:    { prio: 'default', tags: 'warning' }
+  ausfall:    { prio: 'default', tags: 'warning' },
+
+  // --- Ticketwache. "kaufbar" ist dort, was "tiefstand" beim Preiswatcher
+  // ist: die eine Nachricht, auf die man gewartet hat. Sie soll auch durch
+  // eine stille Stunde kommen, denn ein Vorverkauf wartet nicht.
+  kaufbar:    { prio: 'urgent',  tags: 'tickets,fire' },
+  vorverkauf: { prio: 'high',    tags: 'alarm_clock,tickets' },
+  termin:     { prio: 'high',    tags: 'calendar,castle' },
+  ausverkauft:{ prio: 'default', tags: 'no_entry' },
+  aenderung:  { prio: 'default', tags: 'eyes' }
 };
+
+const TICKET_TYP = /^(?:kaufbar|vorverkauf|termin|ausverkauft|aenderung)$/;
 
 function text(m) {
   const z = [];
-  if (m.typ === 'kampagne') {
+  if (m.text) {
     z.push(m.text);
     if (m.code) z.push('Code: ' + m.code);
   }
   for (const g of (m.gruende || [])) z.push('- ' + g);
+  // Wo man kauft, gehoert in die Nachricht selbst: auf dem Handy ist ein
+  // Link zum Antippen mehr wert als eine Erklaerung.
+  if (m.links && m.links.length) {
+    z.push('');
+    z.push('Kaufen:');
+    for (const l of m.links) z.push('  ' + l);
+  }
   if (m.produkte && m.produkte.length) {
     z.push('');
-    z.push('Stand im Shop:');
+    z.push(m.standTitel || 'Stand im Shop:');
     for (const p of m.produkte) {
       let zeile = '  ' + p.name.slice(0, 52) + '  ' + p.jetzt;
       if (p.rabatt) zeile += '  (-' + p.rabatt + '% von ' + p.vorher + ')';
-      if (p.verfuegbar === 'nein') zeile += '  [nicht lieferbar]';
+      // Beim Preiswatcher sagt "lieferbar" nichts Neues - das ist der
+      // Normalfall. Bei Karten ist es die Nachricht.
+      if (p.verfuegbar === 'ja' && TICKET_TYP.test(m.typ)) zeile += '  [zu haben]';
+      else if (p.verfuegbar === 'nein') zeile += '  [nicht lieferbar]';
       else if (p.verfuegbar === 'vorbestellung') zeile += '  [Vorbestellung]';
       if (p.bestpreis && p.bestpreis !== p.jetzt) zeile += '  Tief: ' + p.bestpreis;
       z.push(zeile);
@@ -82,11 +111,17 @@ async function main() {
     console.log('Keine Meldungen.');
     return;
   }
-  if (!process.env.NTFY_TOPIC && !process.env.TELEGRAM_TOKEN) {
+  if (!TROCKEN && !process.env.NTFY_TOPIC && !process.env.TELEGRAM_TOKEN) {
     console.log('Weder NTFY_TOPIC noch TELEGRAM_TOKEN gesetzt - ' + d.meldungen.length + ' Meldung(en) bleiben liegen.');
   }
   for (const m of d.meldungen) {
     console.log('-> ' + m.titel);
+    if (TROCKEN) {
+      const art = KOPF[m.typ] || KOPF.neu;
+      console.log('   [' + m.typ + ', Prioritaet ' + art.prio + ']');
+      console.log(text(m).split('\n').map(l => '   | ' + l).join('\n'));
+      continue;
+    }
     await ntfy(m);
     await telegram(m);
   }

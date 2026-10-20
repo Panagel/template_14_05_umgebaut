@@ -1,0 +1,24 @@
+name: Feuertanz-Quellendiagnose
+
+# Prueft von einem Runner aus, welche Ticketquelle antwortet, was sie
+# hergibt und in welchen Worten sie ihre Karten ankuendigt. Nur von Hand
+# startbar - laeuft in keinem Zeitplan mit.
+#
+# Der Lauf ist die Vorlage fuer ticket-config.js: Zeilen mit [offen ] sind
+# Formulierungen, die die Wache noch nicht deutet.
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Bewertung selbst pruefen
+        run: node ticket-selbsttest.js
+      - name: Quellen pruefen
+        run: node ticket-diag.js

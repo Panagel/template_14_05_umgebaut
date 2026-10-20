@@ -1,0 +1,101 @@
+name: Feuertanz-Ticketwache
+
+# Zweimal pro Stunde. Ein Vorverkauf ist kein Preis, der wochenlang steht:
+# das Festival war in den letzten Jahren ausverkauft, und wer erst abends
+# davon erfaehrt, hat womoeglich nichts mehr zu kaufen. Eine halbe Stunde
+# Verzug ist die Grenze, die sich ohne Dauerlast einhalten laesst.
+#
+# Die Minuten 7 und 37 mit Absicht: zur Minute 0 startet halb GitHub seine
+# Zeitplaene, und Laeufe werden dann verschoben.
+#
+# Steht ein Vorverkaufsstart auf die Minute fest, lohnt fuer die Tage davor
+# '*/10 * * * *'. Ist lange Ruhe, genuegt '7 */6 * * *'.
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+    inputs:
+      testpush:
+        description: 'Testmeldung senden, auch ohne Neuigkeit'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: feuertanz-tickets
+  cancel-in-progress: false
+
+jobs:
+  wache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Quellen abfragen
+        run: node ticket-scan.js
+
+      - name: Testmeldung erzeugen
+        if: github.event.inputs.testpush == 'true'
+        run: node ticket-testpush.js
+
+      - name: Zustand sichern
+        run: |
+          git config user.name "feuertanz-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A data-feuertanz
+          if git diff --staged --quiet; then
+            echo "Keine Aenderungen."
+          else
+            git commit -m "Ticketwache $(date -u +%F\ %H:%M)"
+            # Bei zwei Wachen im selben Repo kann ein anderer Lauf
+            # dazwischenkommen; erst neu aufsetzen, dann schieben.
+            for i in 1 2 3 4; do
+              git pull --rebase --autostash && git push origin HEAD:"$GITHUB_REF_NAME" && break
+              echo "Push fehlgeschlagen, neuer Versuch in $((2**i))s"
+              sleep $((2**i))
+            done
+          fi
+
+      - name: Push senden
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node notify.js data-feuertanz/meldungen.json
+
+      # Nach dem Melden, nicht davor: ein Fehler in der Bewertung soll den
+      # Lauf nicht daran hindern, eine echte Nachricht noch loszuschicken.
+      # Rot wird der Lauf trotzdem, und die Warnung unten geht raus.
+      - name: Bewertung selbst pruefen
+        if: always()
+        run: node ticket-selbsttest.js
+
+      - name: Warnung bei Fehlschlag
+        if: failure()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LAUF: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TEXT="Feuertanz-Ticketwache fehlgeschlagen. Vermutlich hat eine Quelle ihre Seite umgebaut oder sperrt die Runner. Solange das so ist, kann die Wache einen Vorverkaufsstart uebersehen. Lauf: $LAUF"
+          if [ -n "$TELEGRAM_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            curl -sS -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+              --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+              --data-urlencode "text=$TEXT" \
+              -o /dev/null || true
+          fi
+          if [ -n "$NTFY_TOPIC" ]; then
+            curl -sS -H "Title: Feuertanz-Ticketwache fehlgeschlagen" -H "Priority: high" -H "Tags: warning" \
+              ${NTFY_TOKEN:+-H "Authorization: Bearer $NTFY_TOKEN"} \
+              -d "$TEXT" "https://ntfy.sh/$NTFY_TOPIC" || true
+          fi
