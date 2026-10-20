@@ -1,0 +1,54 @@
+{
+ "version": 1,
+ "quellen": {
+  "offiziell": {
+   "ausfaelle": 0,
+   "zuletztDaten": "2026-10-20"
+  },
+  "concertbuero": {
+   "ausfaelle": 0,
+   "zuletztDaten": "2026-10-20"
+  },
+  "eventim": {
+   "ausfaelle": 1,
+   "stummSeit": "2026-10-20"
+  },
+  "reservix": {
+   "ausfaelle": 0,
+   "zuletztDaten": "2026-10-20"
+  }
+ },
+ "ausgaben": {
+  "2027": {
+   "datum": "2027-06-11",
+   "bis": "2027-06-12",
+   "terminQuelle": "feuertanz-festival.com",
+   "terminSatz": "Instagram FEUERTANZ FESTIVAL 2 Festivaltage • Mittelaltermarkt • Marktmusik • Mitternachtskonzerte • Feuerakrobatik • Gaukler • Ritteressen 11.+12. JUNI 2027 ABENBERG BEI NÜRNBERG BURG ABENBERG FEUERTANZ HYMNE by Eric Fi",
+   "terminUrl": "https://www.feuertanz-festival.com/",
+   "kaufbar": true,
+   "kaufbarSeit": "2026-10-20",
+   "kaufbarStill": 0,
+   "ausverkauft": false,
+   "ausverkauftStill": 0,
+   "vvkGemeldet": [],
+   "gesehenSeit": "2026-10-20"
+  }
+ },
+ "ticketSaetze": [
+  "Abenberg bei Nürnberg Nach oben Facebook Instagram Navigation überspringen Home Programm Tickets Infos Mittelalter History © Copyright 2026 by Concertbüro Franken",
+  "Euer Eric Jetzt Ticket sichern!",
+  "Feuertanz Festival Tickets You are using an outdated browser.",
+  "Kinder haben bis zur Vollendung des 12. Lebensjahres freien Eintritt.",
+  "MWSt.) zuzüglich Versandkosten zum Ticket-Shop Auch dieses Jahr wird es beim Feuertanz Festival Einlassbändchen aus Stoff mit Logoeindruck geben.",
+  "Ticket kaufen Für Vorabinfos, neue Acts & mehr:",
+  "Tickets 11.+12. JUNI 2027",
+  "Tickets und weitere Informationen I n den letzten Jahren ging das Feuertanz Festival regelmäßig und schnell „Sold Out“. Abonniere unseren Newsletter , wenn du das nächste Feuertanz Festival auf der Burg Abenberg nicht verpassen möchtest.",
+  "Upgrade your browser today . Navigation überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Navigation überspringen Home Programm Tickets Info",
+  "überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Facebook Instagram FESTIVAL Mittelalter Festival auf der Burg Abenberg D as Feuertanz Fes",
+  "überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Facebook Instagram FEUERTANZ FESTIVAL 2 Festivaltage",
+  "überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Facebook Instagram PROGRAMM Bands Einlass:",
+  "überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Facebook Instagram TICKETS Vorverkauf 122 € (inkl."
+ ],
+ "tag": "2026-10-20",
+ "letzterLauf": "2026-10-20T19:19:07.794Z"
+}
