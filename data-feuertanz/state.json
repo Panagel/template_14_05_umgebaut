@@ -10,8 +10,9 @@
    "zuletztDaten": "2026-10-21"
   },
   "eventim": {
-   "ausfaelle": 0,
-   "zuletztDaten": "2026-10-21"
+   "ausfaelle": 1,
+   "zuletztDaten": "2026-10-21",
+   "stummSeit": "2026-10-21"
   },
   "reservix": {
    "ausfaelle": 0,
@@ -50,5 +51,5 @@
   "überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Facebook Instagram TICKETS Vorverkauf 122 € (inkl."
  ],
  "tag": "2026-10-21",
- "letzterLauf": "2026-10-21T12:20:08.327Z"
+ "letzterLauf": "2026-10-21T17:37:54.204Z"
 }
