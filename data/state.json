@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 57,
+   "laeufe": 58,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -1403,21 +1403,89 @@
      "letzterRabatt": 5,
      "verfuegbar": "ja",
      "zuletztGesehen": "2026-10-22"
+    },
+    "580960531357356041|CAD": {
+     "name": "Bambu Lab H2D - H2D / standard",
+     "url": "https://ca.store.bambulab.com/products/h2d?id=580960531357356041",
+     "waehrung": "CAD",
+     "verlauf": [
+      {
+       "datum": "2026-10-22",
+       "jetzt": 219900,
+       "vorher": 239900,
+       "rabatt": 8,
+       "verfuegbar": "ja"
+      }
+     ],
+     "bestpreis": 219900,
+     "bestpreisDatum": "2026-10-22",
+     "gemeldeterPreis": null,
+     "letzterRabatt": 8,
+     "verfuegbar": "ja",
+     "zuletztGesehen": "2026-10-22"
+    },
+    "580960531357356046|CAD": {
+     "name": "Bambu Lab H2D - H2D AMS Combo / Standard",
+     "url": "https://ca.store.bambulab.com/products/h2d?id=580960531357356046",
+     "waehrung": "CAD",
+     "verlauf": [
+      {
+       "datum": "2026-10-22",
+       "jetzt": 239900,
+       "vorher": 272900,
+       "rabatt": 12,
+       "verfuegbar": "ja"
+      }
+     ],
+     "bestpreis": 239900,
+     "bestpreisDatum": "2026-10-22",
+     "gemeldeterPreis": null,
+     "letzterRabatt": 12,
+     "verfuegbar": "ja",
+     "zuletztGesehen": "2026-10-22"
+    },
+    "789743448914706434|CAD": {
+     "name": "Bambu Lab H2D - H2D AMS Combo / Print More Bundle",
+     "url": "https://ca.store.bambulab.com/products/h2d?id=789743448914706434",
+     "waehrung": "CAD",
+     "verlauf": [
+      {
+       "datum": "2026-10-22",
+       "jetzt": 265900,
+       "vorher": 292500,
+       "rabatt": 9,
+       "verfuegbar": "ja"
+      }
+     ],
+     "bestpreis": 265900,
+     "bestpreisDatum": "2026-10-22",
+     "gemeldeterPreis": null,
+     "letzterRabatt": 9,
+     "verfuegbar": "ja",
+     "zuletztGesehen": "2026-10-22"
     }
    },
    "kampagnen": {
     "blackfriday|": {
-     "text": "Black Friday early access & exclusive offers From $199 and Save up to $450 UNLOCK YOUR OFFER Oct 22, 5:00 AM EDT – Dec 1, 2:00 AM EST",
+     "text": "Black Friday Early Access & Exclusive Offers From $249 and Save up to $500 UNLOCK YOUR OFFER Oct 22, 5:00 AM ET – Dec 1, 2:00 AM ET Black",
      "prozent": null,
      "code": null,
      "aktion": "black friday",
+     "seit": "2026-10-22",
+     "zuletzt": "2026-10-22"
+    },
+    "flashsale|50": {
+     "text": "Flash Sale Starts in -- D -- H -- M -- S 50% OFF TPU 85A / TPU 90A $38.49 CAD Was: $76.99 CAD Notify Me 40% OFF Bambu Engineering Plate",
+     "prozent": 50,
+     "code": null,
+     "aktion": "flash sale",
      "seit": "2026-10-22",
      "zuletzt": "2026-10-22"
     }
    }
   },
   "reichelt": {
-   "laeufe": 57,
+   "laeufe": 58,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -1812,6 +1880,13 @@
       },
       {
        "datum": "2026-10-21",
+       "jetzt": 154900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-22",
        "jetzt": 154900,
        "vorher": null,
        "rabatt": null,
@@ -2276,6 +2351,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-22",
+       "jetzt": 174900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 174900,
@@ -2371,7 +2453,7 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-10-22T10:33:37.966Z",
+ "letzterLauf": "2026-10-22T20:44:43.573Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
@@ -2480,6 +2562,24 @@
    "name": "3D Drucker, Bambu Lab H2D, 40 W Laser",
    "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_40_w_laser-401760",
    "datum": "2026-09-26"
+  },
+  "basis|CAD": {
+   "klasse": "basis",
+   "preis": 219900,
+   "waehrung": "CAD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D / standard",
+   "url": "https://ca.store.bambulab.com/products/h2d?id=580960531357356041",
+   "datum": "2026-10-22"
+  },
+  "combo|CAD": {
+   "klasse": "combo",
+   "preis": 239900,
+   "waehrung": "CAD",
+   "shop": "Bambu Lab Store (US-Ansicht)",
+   "name": "Bambu Lab H2D - H2D AMS Combo / Standard",
+   "url": "https://ca.store.bambulab.com/products/h2d?id=580960531357356046",
+   "datum": "2026-10-22"
   }
  }
 }
