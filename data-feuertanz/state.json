@@ -3,20 +3,20 @@
  "quellen": {
   "offiziell": {
    "ausfaelle": 0,
-   "zuletztDaten": "2026-10-22"
+   "zuletztDaten": "2026-10-23"
   },
   "concertbuero": {
    "ausfaelle": 0,
-   "zuletztDaten": "2026-10-22"
+   "zuletztDaten": "2026-10-23"
   },
   "eventim": {
-   "ausfaelle": 8,
+   "ausfaelle": 9,
    "zuletztDaten": "2026-10-21",
    "stummSeit": "2026-10-21"
   },
   "reservix": {
    "ausfaelle": 0,
-   "zuletztDaten": "2026-10-22"
+   "zuletztDaten": "2026-10-23"
   }
  },
  "ausgaben": {
@@ -50,6 +50,6 @@
   "überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Facebook Instagram PROGRAMM Bands Einlass:",
   "überspringen Home Programm Tickets Infos Einlassinfos Anfahrt Camping Ritteressen Die Burg Die Museen Mittelalter Markt Festival History Fotos Videos Facebook Instagram TICKETS Vorverkauf 122 € (inkl."
  ],
- "tag": "2026-10-22",
- "letzterLauf": "2026-10-22T23:18:05.419Z"
+ "tag": "2026-10-23",
+ "letzterLauf": "2026-10-23T01:54:01.416Z"
 }
