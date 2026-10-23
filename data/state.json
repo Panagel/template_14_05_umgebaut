@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 59,
+   "laeufe": 60,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -404,6 +404,13 @@
       },
       {
        "datum": "2026-10-22",
+       "jetzt": 174900,
+       "vorher": 199900,
+       "rabatt": 13,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-23",
        "jetzt": 174900,
        "vorher": 199900,
        "rabatt": 13,
@@ -916,6 +923,13 @@
        "vorher": 174900,
        "rabatt": 11,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-23",
+       "jetzt": 154900,
+       "vorher": 174900,
+       "rabatt": 11,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 154900,
@@ -1396,13 +1410,20 @@
        "vorher": 174900,
        "rabatt": 16,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-23",
+       "jetzt": 146900,
+       "vorher": 174900,
+       "rabatt": 16,
+       "verfuegbar": "nein"
       }
      ],
      "bestpreis": 146900,
      "bestpreisDatum": "2026-09-26",
      "gemeldeterPreis": null,
      "letzterRabatt": 16,
-     "verfuegbar": "ja",
+     "verfuegbar": "nein",
      "zuletztGesehen": "2026-10-23"
     },
     "789701328019398658|USD": {
@@ -1412,6 +1433,13 @@
      "verlauf": [
       {
        "datum": "2026-10-22",
+       "jetzt": 199900,
+       "vorher": 210800,
+       "rabatt": 5,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-23",
        "jetzt": 199900,
        "vorher": 210800,
        "rabatt": 5,
@@ -1495,7 +1523,7 @@
    },
    "kampagnen": {
     "blackfriday|": {
-     "text": "Black Friday Is Coming! Subscribe Now to Get $50 in Coupons >> ⏰Black Friday Is Coming! Subscribe Now to Get $50 in Coupons >> Starting",
+     "text": "Black Friday Sneak Peek Subscribe to Newsletter & get extra coupons before Oct 27, 8AM UNLOCK YOUR OFFER Oct 22, 5:00 AM EDT – Dec 1, 2:00",
      "prozent": null,
      "code": null,
      "aktion": "black friday",
@@ -1513,7 +1541,7 @@
    }
   },
   "reichelt": {
-   "laeufe": 59,
+   "laeufe": 60,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -1922,6 +1950,13 @@
       },
       {
        "datum": "2026-10-22",
+       "jetzt": 154900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-23",
        "jetzt": 154900,
        "vorher": null,
        "rabatt": null,
@@ -2400,6 +2435,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-23",
+       "jetzt": 174900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 174900,
@@ -2495,7 +2537,7 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-10-23T10:27:18.803Z",
+ "letzterLauf": "2026-10-23T20:37:12.497Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
