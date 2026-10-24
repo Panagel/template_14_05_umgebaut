@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 60,
+   "laeufe": 61,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -422,6 +422,13 @@
        "vorher": 199900,
        "rabatt": 13,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-24",
+       "jetzt": 174900,
+       "vorher": 199900,
+       "rabatt": 13,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 174900,
@@ -429,7 +436,7 @@
      "gemeldeterPreis": null,
      "letzterRabatt": 13,
      "verfuegbar": "ja",
-     "zuletztGesehen": "2026-10-23"
+     "zuletztGesehen": "2026-10-24"
     },
     "581025672340709390|USD": {
      "name": "Bambu Lab H2D - H2D Laser Full Combo / 10W",
@@ -930,6 +937,13 @@
        "vorher": 174900,
        "rabatt": 11,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-24",
+       "jetzt": 154900,
+       "vorher": 174900,
+       "rabatt": 11,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 154900,
@@ -937,7 +951,7 @@
      "gemeldeterPreis": null,
      "letzterRabatt": 11,
      "verfuegbar": "ja",
-     "zuletztGesehen": "2026-10-23"
+     "zuletztGesehen": "2026-10-24"
     },
     "622679274382356483|USD": {
      "name": "Bambu Lab H2D - H2D AMS Combo / Dual AMS 2 Pro Bundle",
@@ -1417,6 +1431,13 @@
        "vorher": 174900,
        "rabatt": 16,
        "verfuegbar": "nein"
+      },
+      {
+       "datum": "2026-10-24",
+       "jetzt": 146900,
+       "vorher": 174900,
+       "rabatt": 16,
+       "verfuegbar": "nein"
       }
      ],
      "bestpreis": 146900,
@@ -1424,7 +1445,7 @@
      "gemeldeterPreis": null,
      "letzterRabatt": 16,
      "verfuegbar": "nein",
-     "zuletztGesehen": "2026-10-23"
+     "zuletztGesehen": "2026-10-24"
     },
     "789701328019398658|USD": {
      "name": "Bambu Lab H2D - H2D AMS Combo / Print More Bundle",
@@ -1451,6 +1472,13 @@
        "vorher": 210800,
        "rabatt": 5,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-24",
+       "jetzt": 199900,
+       "vorher": 210800,
+       "rabatt": 5,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 199900,
@@ -1458,7 +1486,7 @@
      "gemeldeterPreis": null,
      "letzterRabatt": 5,
      "verfuegbar": "ja",
-     "zuletztGesehen": "2026-10-23"
+     "zuletztGesehen": "2026-10-24"
     },
     "580960531357356041|CAD": {
      "name": "Bambu Lab H2D - H2D / standard",
@@ -1528,7 +1556,7 @@
      "code": null,
      "aktion": "black friday",
      "seit": "2026-10-22",
-     "zuletzt": "2026-10-23"
+     "zuletzt": "2026-10-24"
     },
     "flashsale|50": {
      "text": "Flash Sale Starts in -- D -- H -- M -- S 50% OFF TPU 85A / TPU 90A $38.49 CAD Was: $76.99 CAD Notify Me 40% OFF Bambu Engineering Plate",
@@ -1541,7 +1569,7 @@
    }
   },
   "reichelt": {
-   "laeufe": 60,
+   "laeufe": 61,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -1968,6 +1996,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-24",
+       "jetzt": 154900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 154900,
@@ -1975,7 +2010,7 @@
      "gemeldeterPreis": null,
      "letzterRabatt": null,
      "verfuegbar": "ja",
-     "zuletztGesehen": "2026-10-23"
+     "zuletztGesehen": "2026-10-24"
     },
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_pro-411918#3ddruckerbambulabh2dpro|EUR": {
      "name": "3D Drucker, Bambu Lab H2D Pro",
@@ -2442,6 +2477,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-24",
+       "jetzt": 174900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 174900,
@@ -2449,7 +2491,7 @@
      "gemeldeterPreis": null,
      "letzterRabatt": null,
      "verfuegbar": "ja",
-     "zuletztGesehen": "2026-10-23"
+     "zuletztGesehen": "2026-10-24"
     },
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_10_w_laser-401759#3ddruckerbambulabh2d10wlaser|EUR": {
      "name": "3D Drucker, Bambu Lab H2D, 10 W Laser",
@@ -2537,7 +2579,7 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-10-23T20:37:12.497Z",
+ "letzterLauf": "2026-10-24T09:45:02.636Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
