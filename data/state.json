@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 67,
+   "laeufe": 68,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -471,12 +471,19 @@
        "vorher": 199900,
        "rabatt": 13,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-27",
+       "jetzt": 159900,
+       "vorher": 174900,
+       "rabatt": 9,
+       "verfuegbar": "ja"
       }
      ],
-     "bestpreis": 174900,
-     "bestpreisDatum": "2026-09-26",
-     "gemeldeterPreis": null,
-     "letzterRabatt": 13,
+     "bestpreis": 159900,
+     "bestpreisDatum": "2026-10-27",
+     "gemeldeterPreis": 159900,
+     "letzterRabatt": 9,
      "verfuegbar": "ja",
      "zuletztGesehen": "2026-10-27"
     },
@@ -1028,12 +1035,19 @@
        "vorher": 174900,
        "rabatt": 11,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-27",
+       "jetzt": 139900,
+       "vorher": 154900,
+       "rabatt": 10,
+       "verfuegbar": "ja"
       }
      ],
-     "bestpreis": 154900,
-     "bestpreisDatum": "2026-09-26",
-     "gemeldeterPreis": null,
-     "letzterRabatt": 11,
+     "bestpreis": 139900,
+     "bestpreisDatum": "2026-10-27",
+     "gemeldeterPreis": 139900,
+     "letzterRabatt": 10,
      "verfuegbar": "ja",
      "zuletztGesehen": "2026-10-27"
     },
@@ -1564,6 +1578,13 @@
        "vorher": 174900,
        "rabatt": 16,
        "verfuegbar": "nein"
+      },
+      {
+       "datum": "2026-10-27",
+       "jetzt": 146900,
+       "vorher": 174900,
+       "rabatt": 16,
+       "verfuegbar": "nein"
       }
      ],
      "bestpreis": 146900,
@@ -1647,12 +1668,19 @@
        "vorher": 210800,
        "rabatt": 5,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-27",
+       "jetzt": 184900,
+       "vorher": 199900,
+       "rabatt": 8,
+       "verfuegbar": "ja"
       }
      ],
-     "bestpreis": 199900,
-     "bestpreisDatum": "2026-10-22",
-     "gemeldeterPreis": null,
-     "letzterRabatt": 5,
+     "bestpreis": 184900,
+     "bestpreisDatum": "2026-10-27",
+     "gemeldeterPreis": 184900,
+     "letzterRabatt": 8,
      "verfuegbar": "ja",
      "zuletztGesehen": "2026-10-27"
     },
@@ -1719,7 +1747,7 @@
    },
    "kampagnen": {
     "blackfriday|": {
-     "text": "Black Friday Sneak Peek Subscribe to Newsletter & get extra coupons before Oct 27, 8AM UNLOCK YOUR OFFER Oct 22, 5:00 AM EDT – Dec 1, 2:00",
+     "text": "Black Friday Sale is On! Up to $450 Off! Shop Now >> 🔥Black Friday Sale is On! Up to $450 Off! Shop Now >> Starting from Aug 14 3:00 AM",
      "prozent": null,
      "code": null,
      "aktion": "black friday",
@@ -1737,7 +1765,7 @@
    }
   },
   "reichelt": {
-   "laeufe": 67,
+   "laeufe": 68,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -2213,11 +2241,18 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-27",
+       "jetzt": 139900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
-     "bestpreis": 154900,
-     "bestpreisDatum": "2026-09-26",
-     "gemeldeterPreis": null,
+     "bestpreis": 139900,
+     "bestpreisDatum": "2026-10-27",
+     "gemeldeterPreis": 139900,
      "letzterRabatt": null,
      "verfuegbar": "ja",
      "zuletztGesehen": "2026-10-27"
@@ -2736,11 +2771,18 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-27",
+       "jetzt": 159900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
-     "bestpreis": 174900,
-     "bestpreisDatum": "2026-09-26",
-     "gemeldeterPreis": null,
+     "bestpreis": 159900,
+     "bestpreisDatum": "2026-10-27",
+     "gemeldeterPreis": 159900,
      "letzterRabatt": null,
      "verfuegbar": "ja",
      "zuletztGesehen": "2026-10-27"
@@ -2831,16 +2873,16 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-10-27T10:52:43.591Z",
+ "letzterLauf": "2026-10-27T21:27:43.912Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
-   "preis": 174900,
+   "preis": 159900,
    "waehrung": "USD",
    "shop": "Bambu Lab Store (US-Ansicht)",
    "name": "Bambu Lab H2D - H2D AMS Combo / Standard",
    "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385",
-   "datum": "2026-09-26"
+   "datum": "2026-10-27"
   },
   "laser10|USD": {
    "klasse": "laser10",
@@ -2862,12 +2904,12 @@
   },
   "basis|USD": {
    "klasse": "basis",
-   "preis": 154900,
+   "preis": 139900,
    "waehrung": "USD",
    "shop": "Bambu Lab Store (US-Ansicht)",
    "name": "Bambu Lab H2D - H2D / standard",
    "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709400",
-   "datum": "2026-09-26"
+   "datum": "2026-10-27"
   },
   "combo-dual|USD": {
    "klasse": "combo-dual",
@@ -2898,12 +2940,12 @@
   },
   "basis|EUR": {
    "klasse": "basis",
-   "preis": 154900,
+   "preis": 139900,
    "waehrung": "EUR",
    "shop": "reichelt",
    "name": "3D Drucker, Bambu Lab H2D",
    "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245",
-   "datum": "2026-09-26"
+   "datum": "2026-10-27"
   },
   "pro+basis|EUR": {
    "klasse": "pro+basis",
@@ -2916,12 +2958,12 @@
   },
   "combo|EUR": {
    "klasse": "combo",
-   "preis": 174900,
+   "preis": 159900,
    "waehrung": "EUR",
    "shop": "reichelt",
    "name": "3D Drucker, Bambu Lab H2D AMS Combo",
    "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246",
-   "datum": "2026-09-26"
+   "datum": "2026-10-27"
   },
   "laser10|EUR": {
    "klasse": "laser10",
