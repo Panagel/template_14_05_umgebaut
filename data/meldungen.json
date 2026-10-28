@@ -1,116 +1,6 @@
 {
- "datum": "2026-10-27",
- "meldungen": [
-  {
-   "typ": "tiefstand",
-   "shop": "Bambu Lab Store (US-Ansicht)",
-   "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385",
-   "titel": "Tiefstpreis H2D AMS Combo: 1.599,00 USD bei Bambu Lab Store (US-Ansicht)",
-   "gruende": [
-    "Tiefstpreis fuer H2D AMS Combo: 1.599,00 USD - billiger als alles bisher Gesehene (1.749,00 USD bei Bambu Lab Store (US-Ansicht) am 2026-09-26)",
-    "Preis 1.749,00 USD -> 1.599,00 USD (-9% gegen den Median der letzten Laeufe)",
-    "Preise des US-Shops - der Runner steht in den USA. Als Fruehwarnung brauchbar, weil Bambu seine Aktionen global faehrt."
-   ],
-   "produkte": [
-    {
-     "name": "Bambu Lab H2D - H2D AMS Combo / Standard",
-     "jetzt": "1.599,00 USD",
-     "vorher": "1.749,00 USD",
-     "rabatt": 9,
-     "bestpreis": "1.599,00 USD",
-     "verfuegbar": "ja",
-     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385"
-    }
-   ]
-  },
-  {
-   "typ": "tiefstand",
-   "shop": "Bambu Lab Store (US-Ansicht)",
-   "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709400",
-   "titel": "Tiefstpreis H2D: 1.399,00 USD bei Bambu Lab Store (US-Ansicht)",
-   "gruende": [
-    "Tiefstpreis fuer H2D: 1.399,00 USD - billiger als alles bisher Gesehene (1.549,00 USD bei Bambu Lab Store (US-Ansicht) am 2026-09-26)",
-    "Preis 1.549,00 USD -> 1.399,00 USD (-10% gegen den Median der letzten Laeufe)",
-    "Preise des US-Shops - der Runner steht in den USA. Als Fruehwarnung brauchbar, weil Bambu seine Aktionen global faehrt."
-   ],
-   "produkte": [
-    {
-     "name": "Bambu Lab H2D - H2D / standard",
-     "jetzt": "1.399,00 USD",
-     "vorher": "1.549,00 USD",
-     "rabatt": 10,
-     "bestpreis": "1.399,00 USD",
-     "verfuegbar": "ja",
-     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709400"
-    }
-   ]
-  },
-  {
-   "typ": "preis",
-   "shop": "Bambu Lab Store (US-Ansicht)",
-   "url": "https://us.store.bambulab.com/products/h2d?id=789701328019398658",
-   "titel": "Bambu Lab Store (US-Ansicht): Bambu Lab H2D - H2D AMS Combo / Print More Bundle fuer 1.849,00 USD",
-   "gruende": [
-    "Tiefster Preis, den dieser Shop bisher hatte: 1.849,00 USD (vorher 1.999,00 USD am 2026-10-22)",
-    "Preis 1.999,00 USD -> 1.849,00 USD (-8% gegen den Median der letzten Laeufe)",
-    "Shop weist -8% aus: 1.999,00 USD -> 1.849,00 USD",
-    "Preise des US-Shops - der Runner steht in den USA. Als Fruehwarnung brauchbar, weil Bambu seine Aktionen global faehrt."
-   ],
-   "produkte": [
-    {
-     "name": "Bambu Lab H2D - H2D AMS Combo / Print More Bundle",
-     "jetzt": "1.849,00 USD",
-     "vorher": "1.999,00 USD",
-     "rabatt": 8,
-     "bestpreis": "1.849,00 USD",
-     "verfuegbar": "ja",
-     "url": "https://us.store.bambulab.com/products/h2d?id=789701328019398658"
-    }
-   ]
-  },
-  {
-   "typ": "tiefstand",
-   "shop": "reichelt",
-   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245",
-   "titel": "Tiefstpreis H2D: 1.399,00 EUR bei reichelt",
-   "gruende": [
-    "Tiefstpreis fuer H2D: 1.399,00 EUR - billiger als alles bisher Gesehene (1.549,00 EUR bei reichelt am 2026-09-26)",
-    "Preis 1.549,00 EUR -> 1.399,00 EUR (-10% gegen den Median der letzten Laeufe)"
-   ],
-   "produkte": [
-    {
-     "name": "3D Drucker, Bambu Lab H2D",
-     "jetzt": "1.399,00 EUR",
-     "vorher": null,
-     "rabatt": null,
-     "bestpreis": "1.399,00 EUR",
-     "verfuegbar": "ja",
-     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245"
-    }
-   ]
-  },
-  {
-   "typ": "tiefstand",
-   "shop": "reichelt",
-   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246",
-   "titel": "Tiefstpreis H2D AMS Combo: 1.599,00 EUR bei reichelt",
-   "gruende": [
-    "Tiefstpreis fuer H2D AMS Combo: 1.599,00 EUR - billiger als alles bisher Gesehene (1.749,00 EUR bei reichelt am 2026-09-26)",
-    "Preis 1.749,00 EUR -> 1.599,00 EUR (-9% gegen den Median der letzten Laeufe)"
-   ],
-   "produkte": [
-    {
-     "name": "3D Drucker, Bambu Lab H2D AMS Combo",
-     "jetzt": "1.599,00 EUR",
-     "vorher": null,
-     "rabatt": null,
-     "bestpreis": "1.599,00 EUR",
-     "verfuegbar": "ja",
-     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246"
-    }
-   ]
-  }
- ],
+ "datum": "2026-10-28",
+ "meldungen": [],
  "uebersicht": [
   {
    "shop": "Bambu Lab Store (US-Ansicht)",
@@ -141,15 +31,6 @@
      "bestpreis": "1.849,00 USD",
      "verfuegbar": "ja",
      "url": "https://us.store.bambulab.com/products/h2d?id=789701328019398658"
-    },
-    {
-     "name": "[Refurbished] Bambu Lab H2D 3D Printer - H2D AMS Combo",
-     "jetzt": "1.469,00 USD",
-     "vorher": "1.749,00 USD",
-     "rabatt": 16,
-     "bestpreis": "1.469,00 USD",
-     "verfuegbar": "nein",
-     "url": "https://us.store.bambulab.com/products/refurbished-bambu-lab-h2d-3d-printer?id=776282589202808834"
     }
    ]
   },
