@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 69,
+   "laeufe": 70,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -474,6 +474,13 @@
       },
       {
        "datum": "2026-10-27",
+       "jetzt": 159900,
+       "vorher": 174900,
+       "rabatt": 9,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-28",
        "jetzt": 159900,
        "vorher": 174900,
        "rabatt": 9,
@@ -1045,6 +1052,13 @@
       },
       {
        "datum": "2026-10-27",
+       "jetzt": 139900,
+       "vorher": 154900,
+       "rabatt": 10,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-28",
        "jetzt": 139900,
        "vorher": 154900,
        "rabatt": 10,
@@ -1696,6 +1710,13 @@
        "vorher": 199900,
        "rabatt": 8,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-28",
+       "jetzt": 184900,
+       "vorher": 199900,
+       "rabatt": 8,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 184900,
@@ -1786,7 +1807,7 @@
    }
   },
   "reichelt": {
-   "laeufe": 69,
+   "laeufe": 70,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -2265,6 +2286,13 @@
       },
       {
        "datum": "2026-10-27",
+       "jetzt": 139900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-28",
        "jetzt": 139900,
        "vorher": null,
        "rabatt": null,
@@ -2813,13 +2841,20 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-10-28",
+       "jetzt": 159900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "vorbestellung"
       }
      ],
      "bestpreis": 159900,
      "bestpreisDatum": "2026-10-27",
      "gemeldeterPreis": 159900,
      "letzterRabatt": null,
-     "verfuegbar": "ja",
+     "verfuegbar": "vorbestellung",
      "zuletztGesehen": "2026-10-28"
     },
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_10_w_laser-401759#3ddruckerbambulabh2d10wlaser|EUR": {
@@ -2908,7 +2943,7 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-10-28T11:33:37.346Z",
+ "letzterLauf": "2026-10-28T21:52:46.622Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
