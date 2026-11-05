@@ -1,5 +1,5 @@
 {
- "datum": "2026-11-04",
+ "datum": "2026-11-05",
  "meldungen": [],
  "uebersicht": [
   {
@@ -15,15 +15,6 @@
      "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709385"
     },
     {
-     "name": "Bambu Lab H2D - H2D / standard",
-     "jetzt": "1.399,00 USD",
-     "vorher": "1.549,00 USD",
-     "rabatt": 10,
-     "bestpreis": "1.399,00 USD",
-     "verfuegbar": "ja",
-     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709400"
-    },
-    {
      "name": "Bambu Lab H2D - H2D AMS Combo / Print More Bundle",
      "jetzt": "1.849,00 USD",
      "vorher": "1.999,00 USD",
@@ -31,6 +22,15 @@
      "bestpreis": "1.849,00 USD",
      "verfuegbar": "ja",
      "url": "https://us.store.bambulab.com/products/h2d?id=789701328019398658"
+    },
+    {
+     "name": "Bambu Lab H2D - H2D / standard",
+     "jetzt": "1.399,00 USD",
+     "vorher": "1.549,00 USD",
+     "rabatt": 10,
+     "bestpreis": "1.399,00 USD",
+     "verfuegbar": "ja",
+     "url": "https://us.store.bambulab.com/products/h2d?id=581025672340709400"
     }
    ]
   },
