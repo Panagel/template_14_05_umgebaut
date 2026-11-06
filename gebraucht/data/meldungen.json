@@ -1,4 +1,38 @@
 {
- "datum": "2026-11-05",
- "meldungen": []
+ "datum": "2026-11-06",
+ "meldungen": [
+  {
+   "titel": "Guenstige H2D Combo: 1.180 EUR VB, 1480 h",
+   "name": "BambuLab H2D Combo incl. AMS 2 Pro - 3D Drucker",
+   "ort": "04157 Leipzig - Gohlis-Mitte",
+   "gewerblich": false,
+   "gruende": [
+    "8 % unter dem Schaetzpreis fuer 1480 h (1.276 EUR)",
+    "Wertverlust je 100 h laut Kalkulation: 10 EUR"
+   ],
+   "url": "https://www.kleinanzeigen.de/s-anzeige/bambulab-h2d-combo-incl-ams-2-pro-3d-drucker/3561612277-168-30067"
+  },
+  {
+   "titel": "Guenstige H2D Combo: 1.199 EUR VB, 1214 h",
+   "name": "Bambu Lab H2D 3D Drucker",
+   "ort": "90453 Nürnberg - Aussenstadt-Sued",
+   "gewerblich": false,
+   "gruende": [
+    "8 % unter dem Schaetzpreis fuer 1214 h (1.304 EUR)",
+    "Wertverlust je 100 h laut Kalkulation: 10 EUR"
+   ],
+   "url": "https://www.kleinanzeigen.de/s-anzeige/bambu-lab-h2d-3d-drucker/3562283976-168-6834"
+  },
+  {
+   "titel": "Guenstige H2D Combo: 1.150 EUR VB, 855 h",
+   "name": "Bambu Lab H2D + AMS2 Pro 3D Drucker mit 855 Stunden",
+   "ort": "34582 Hessen - Borken",
+   "gewerblich": false,
+   "gruende": [
+    "14 % unter dem Schaetzpreis fuer 855 h (1.341 EUR)",
+    "Wertverlust je 100 h laut Kalkulation: 10 EUR"
+   ],
+   "url": "https://www.kleinanzeigen.de/s-anzeige/bambu-lab-h2d-ams2-pro-3d-drucker-mit-855-stunden/3562649659-168-4395"
+  }
+ ]
 }
