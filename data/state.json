@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 89,
+   "laeufe": 90,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -614,6 +614,13 @@
       },
       {
        "datum": "2026-11-06",
+       "jetzt": 159900,
+       "vorher": 174900,
+       "rabatt": 9,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-07",
        "jetzt": 159900,
        "vorher": 174900,
        "rabatt": 9,
@@ -1325,6 +1332,13 @@
       },
       {
        "datum": "2026-11-06",
+       "jetzt": 139900,
+       "vorher": 154900,
+       "rabatt": 10,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-07",
        "jetzt": 139900,
        "vorher": 154900,
        "rabatt": 10,
@@ -2116,6 +2130,13 @@
        "vorher": 199900,
        "rabatt": 8,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-07",
+       "jetzt": 184900,
+       "vorher": 199900,
+       "rabatt": 8,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 184900,
@@ -2206,7 +2227,7 @@
    }
   },
   "reichelt": {
-   "laeufe": 89,
+   "laeufe": 90,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -2825,6 +2846,13 @@
       },
       {
        "datum": "2026-11-06",
+       "jetzt": 139900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-07",
        "jetzt": 139900,
        "vorher": null,
        "rabatt": null,
@@ -3513,6 +3541,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "vorbestellung"
+      },
+      {
+       "datum": "2026-11-07",
+       "jetzt": 159900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "vorbestellung"
       }
      ],
      "bestpreis": 159900,
@@ -3608,7 +3643,7 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-11-07T11:54:13.036Z",
+ "letzterLauf": "2026-11-07T21:03:50.083Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
