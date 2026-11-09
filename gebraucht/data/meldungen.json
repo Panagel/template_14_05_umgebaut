@@ -1,4 +1,16 @@
 {
- "datum": "2026-11-08",
- "meldungen": []
+ "datum": "2026-11-09",
+ "meldungen": [
+  {
+   "titel": "Guenstige H2D Combo: 1.200 EUR, 2054 h",
+   "name": "Bambu Lab H2D mit AMS 2 Pro",
+   "ort": "44265 Dortmund - Wichlinghofen",
+   "gewerblich": false,
+   "gruende": [
+    "8 % unter dem Schaetzpreis fuer 2054 h (1.302 EUR)",
+    "Wertverlust je 100 h laut Kalkulation: 8 EUR"
+   ],
+   "url": "https://www.kleinanzeigen.de/s-anzeige/bambu-lab-h2d-mit-optional-2-ams-2-pro-und-2-ams-ht/3560901346-168-28129"
+  }
+ ]
 }
