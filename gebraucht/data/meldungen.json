@@ -1,40 +1,17 @@
 {
- "datum": "2026-11-11",
+ "datum": "2026-11-12",
  "meldungen": [
   {
-   "titel": "Guenstige H2D Combo: 1.290 EUR VB, 800 h",
-   "name": "Bambulab H2D AMS Combo + Zubehör",
-   "ort": "36199 Hessen - Rotenburg",
+   "titel": "Guenstige H2D Combo: 1.300 EUR, 440 h",
+   "name": "Bambu Lab H2D AMS 2 Pro 2 X 1Stk",
+   "ort": "17034 Mecklenburg-Vorpommern - Neubrandenburg 04.1",
    "gewerblich": false,
    "gruende": [
-    "8 % unter dem Schaetzpreis fuer 800 h (1.402 EUR)",
+    "9 % unter dem Schaetzpreis fuer 440 h (1.434 EUR)",
     "gesenkt von 1.400 EUR",
-    "Wertverlust je 100 h laut Kalkulation: 8 EUR"
+    "Wertverlust je 100 h laut Kalkulation: 6 EUR"
    ],
-   "url": "https://www.kleinanzeigen.de/s-anzeige/bambulab-h2d-ams-combo-zubehoer/3565411274-168-4643"
-  },
-  {
-   "titel": "Guenstige H2D Combo: 1.200 EUR, 1173 h",
-   "name": "Bambu Lab H2D Combo",
-   "ort": "47198 Duisburg - Homberg/Ruhrort/Baerl",
-   "gewerblich": false,
-   "gruende": [
-    "13 % unter dem Schaetzpreis fuer 1173 h (1.373 EUR)",
-    "Wertverlust je 100 h laut Kalkulation: 8 EUR"
-   ],
-   "url": "https://www.kleinanzeigen.de/s-anzeige/bambu-lab-h2d-combo/3567785300-168-2140"
-  },
-  {
-   "titel": "Guenstige H2D Combo: 1.000 EUR, Stunden ?",
-   "name": "SUCHE BAMBU LAB H2D",
-   "ort": "46519 Nordrhein-Westfalen - Alpen",
-   "gewerblich": false,
-   "gruende": [
-    "63 % vom Neupreis (1.599 EUR), Stunden nicht genannt",
-    "der Preis passt zu etwa 6030 Druckstunden",
-    "Wertverlust je 100 h laut Kalkulation: 8 EUR"
-   ],
-   "url": "https://www.kleinanzeigen.de/s-anzeige/suche-bambu-lab-h2d/3568429745-168-1398"
+   "url": "https://www.kleinanzeigen.de/s-anzeige/bambu-lab-h2d-ams-2-pro-2-x-1stk/3561649111-168-254"
   }
  ]
 }
