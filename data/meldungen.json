@@ -1,6 +1,27 @@
 {
- "datum": "2026-11-15",
- "meldungen": [],
+ "datum": "2026-11-16",
+ "meldungen": [
+  {
+   "typ": "verfuegbar",
+   "shop": "reichelt",
+   "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246",
+   "titel": "reichelt: 3D Drucker, Bambu Lab H2D AMS Combo wieder lieferbar",
+   "gruende": [
+    "Wieder lieferbar (vorher: Vorbestellung)"
+   ],
+   "produkte": [
+    {
+     "name": "3D Drucker, Bambu Lab H2D AMS Combo",
+     "jetzt": "1.599,00 EUR",
+     "vorher": null,
+     "rabatt": null,
+     "bestpreis": "1.599,00 EUR",
+     "verfuegbar": "ja",
+     "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246"
+    }
+   ]
+  }
+ ],
  "uebersicht": [
   {
    "shop": "Bambu Lab Store (US-Ansicht)",
@@ -52,7 +73,7 @@
      "vorher": null,
      "rabatt": null,
      "bestpreis": "1.599,00 EUR",
-     "verfuegbar": "vorbestellung",
+     "verfuegbar": "ja",
      "url": "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d_ams_combo-401246"
     }
    ]
