@@ -2,7 +2,7 @@
  "version": 1,
  "shops": {
   "bambulab": {
-   "laeufe": 126,
+   "laeufe": 127,
    "ausfaelle": 0,
    "produkte": {
     "581025672340709385|USD": {
@@ -873,6 +873,13 @@
       },
       {
        "datum": "2026-11-25",
+       "jetzt": 159900,
+       "vorher": 174900,
+       "rabatt": 9,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-26",
        "jetzt": 159900,
        "vorher": 174900,
        "rabatt": 9,
@@ -1843,6 +1850,13 @@
       },
       {
        "datum": "2026-11-25",
+       "jetzt": 139900,
+       "vorher": 154900,
+       "rabatt": 10,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-26",
        "jetzt": 139900,
        "vorher": 154900,
        "rabatt": 10,
@@ -2893,6 +2907,13 @@
        "vorher": 199900,
        "rabatt": 8,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-26",
+       "jetzt": 184900,
+       "vorher": 199900,
+       "rabatt": 8,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 184900,
@@ -2965,7 +2986,7 @@
    },
    "kampagnen": {
     "blackfriday|": {
-     "text": "Black Friday Week — 2× Credits on everything, sitewide. SHOP NOW Bambu Lab H3C Tool Changer. Game Changer. From $2,499.00 USD BUY NOW Oct",
+     "text": "Black Friday Week — 2× Credits on everything, sitewide. SHOP NOW Bambu Lab P3C Tool Changer. Now Standard. From $1,149.00 USD BUY NOW",
      "prozent": null,
      "code": null,
      "aktion": "black friday",
@@ -2983,7 +3004,7 @@
    }
   },
   "reichelt": {
-   "laeufe": 126,
+   "laeufe": 127,
    "ausfaelle": 0,
    "produkte": {
     "https://www.reichelt.de/de/de/shop/produkt/3d_drucker_bambu_lab_h2d-401245#3ddruckerbambulabh2d|EUR": {
@@ -3861,6 +3882,13 @@
       },
       {
        "datum": "2026-11-25",
+       "jetzt": 139900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-26",
        "jetzt": 139900,
        "vorher": null,
        "rabatt": null,
@@ -4808,6 +4836,13 @@
        "vorher": null,
        "rabatt": null,
        "verfuegbar": "ja"
+      },
+      {
+       "datum": "2026-11-26",
+       "jetzt": 159900,
+       "vorher": null,
+       "rabatt": null,
+       "verfuegbar": "ja"
       }
      ],
      "bestpreis": 159900,
@@ -4903,7 +4938,7 @@
    "kampagnen": {}
   }
  },
- "letzterLauf": "2026-11-26T01:07:22.501Z",
+ "letzterLauf": "2026-11-26T15:41:03.317Z",
  "tiefstpreise": {
   "combo|USD": {
    "klasse": "combo",
